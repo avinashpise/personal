@@ -23,7 +23,6 @@ paths:
         The Serving Operator retrieves the Application and Developer data to allow on Authentication Scheme.
 
 
-
         **Pre-Requisites - Discovery Call**
 
         * Before Request validator API call, make Discovery service call to obtain the ‘Exchange client_id and client_secret‘
