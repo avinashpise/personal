@@ -23,20 +23,10 @@ paths:
         The Serving Operator retrieves the Application and Developer data to allow on Authentication Scheme.
 
 
+
         **Pre-Requisites - Discovery Call**
 
         * Before Request validator API call, make Discovery service call to obtain the ‘Exchange client_id and client_secret‘
-
-      
-        **Error Responses**
-
-        | Scenario             | Status           | Error                    | Description                 |
-        |----------------------|----------------------|--------------------------|-----------------------------|
-        | Missing client_id            | 400 Bad Request| Invalid_Request       | Invalid Client-ID |
-        | Missing Authorization Header | 401 Unauthorized| Authentication Failed | Authorization header missing |
-        | Invalid client_secret        | 401 Unauthorized| Unauthorized_Access   | Invalid Client Secret |
-        | Invalid client_id            | 404 Not Found| Not_Found_Entity      | XCredential not found for x-client-id[client ID] and operator[Operator ID] |
-        | Invalid/Unapproved orgID     | 404 Not Found| Not_Found_Entity      | XCredential not found for x-client-id[client ID] and operator[Operator ID] |
 
       produces:
         - application/json
@@ -119,11 +109,11 @@ definitions:
       error:
         type: string
         description: |
-          Error for mising authentication header : "Authentication Failed" | Error for Invalid Client Secret :  "Unauthorized_Access"
+          Error for missing authentication header : "Authentication Failed" | Error for Invalid Client Secret :  "Unauthorized_Access"
       description:
         type: string
         description: |
-          Description for mising authentication header : "Authorization header missing" | Description for invalid client secret :  "Invalid Client Secret"
+          Description for missing authentication header : "Authorization header missing" | Description for invalid client secret :  "Invalid Client Secret"
 
   error404:
     type: object
