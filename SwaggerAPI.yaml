@@ -15,7 +15,7 @@ paths:
   /{orgID}/validate:
     get:
       summary: Request Validator API
-      description: |
+      description: >-
         Serving Operator service delivery platform receives the ‘Exchange client_id‘ and ‘Exchange client_secret‘ on applicable Authentication scheme.
 
         Serving Operator validates this Exchange credentials using the Serving Operator cache / Request Validator API call.
@@ -25,7 +25,7 @@ paths:
 
         **Pre-Requisites - Discovery Call**
 
-        * Before Request validator API call, make Discovery service call to obtain the ‘Exchange client_id and client_secret‘
+         Before Request validator API call, make Discovery service call to obtain the ‘Exchange client_id and client_secret‘
 
       produces:
         - application/json
@@ -83,13 +83,16 @@ securityDefinitions:
 definitions:
   cli_name:
     type: object
+    description: It is a string representing the application client name.//json array
     properties:
       name:
+        description: client name
         type: string
   app_name:
     type: object
     properties:
       name:
+        description: application name
         type: string
 
   error400:
@@ -119,7 +122,7 @@ definitions:
     properties:
       error:
         type: string
-        description: |
+        description: >-
           Error for Invalid client_id : "Not_Found_Entity" | Error for Invalid/Unapproved orgID :  "Not_Found_Entity"
       description:
         type: string
@@ -129,10 +132,12 @@ definitions:
 
   application:
     type: object
+    description: JSON object wrapping the Application details.
     required:
       - tncStatus
     properties:
      appCredId:
+      description: A unique Developer App Credential Identifier
       type: string
 
      devOrgId:
@@ -140,36 +145,44 @@ definitions:
       description: Developer Organization ID.
      devName:
       type: string
+      description: Name of the developer
 
      devId:
       type: string
+      description: Developer's Id
      appName:
       type: string
-
+      description: Application name
      description:
       type: string
-
+      description: Application Description
      appStatus:
       type: string
+      description: Application's current status (APPROVED, UNAPPROVED, REVOKED or REJECTED)
 
      devStatus:
       type: string
-      description:  Developer Status (APPROVED/UNAPPROVED).
+      description:  Developer's current status (APPROVED, UNAPPROVED, REVOKED or REJECTED)
      developerType:
       type: string
-      description:  Developer type (TRUSTED/UNTRUSTED).
+      description:  Developer's current type (TRUSTED/UNTRUSTED).
      tncStatus:
       type: string
       description:  Serving Organization Terms and conditions accepted or unaccepted by the developer (ACCEPTED/UNACCEPTED).
      trustedMode:
       type: string
+      
      appType:
       type: string
-
+      description: Application's type (PRODUCTION or DEVELOPMENT)
+      
      redirectUri:
       type: string
+      description: Applications redirect URI
+      
      supportedApis:
         type: array
+        description: JSON Array of the APIs used by the Application
         items:
          $ref: "#/definitions/app_name"
 
@@ -179,7 +192,7 @@ definitions:
       x_client_id:
         type: string
         format: string
-
+        description: The exchange client_id passed on in the validate call
       orgId:
         type: string
         format: string
