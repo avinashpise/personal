@@ -110,14 +110,6 @@ paths:
           enum:
             - application/json
             - application/xml
-        - name: Content-Type
-          in: header
-          description: Content Type
-          type: string
-          default: application/xml
-          enum:
-            - x-www-form-urlencoded
-            - application/xml
       responses:
         200:
           description: Success
@@ -189,10 +181,7 @@ definitions:
         type: string
         description: |
           Description for Invalid client_id  : "XCredential not found for x-client-id[client ID] and operator[Operator ID]" | Description for Invalid/Unapproved orgID :  "XCredential not found for x-client-id[client ID] and operator[Operator ID]"
-  supportedApis:
-    type: array
-    items:
-        $ref: "#/definitions/app_name"
+
 
   application:
     type: object
@@ -236,7 +225,9 @@ definitions:
      redirectUri:
       type: string
      supportedApis:
-      $ref: "#/definitions/supportedApis"
+        type: array
+        items:
+         $ref: "#/definitions/app_name"
 
   responses:
     type: object
