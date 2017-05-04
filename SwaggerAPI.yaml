@@ -27,52 +27,7 @@ paths:
 
         * Before Request validator API call, make Discovery service call to obtain the ‘Exchange client_id and client_secret‘
 
-        Below is a sample response of **Discovery API** call.For further details please refer **Discovery API Documentation**.
-
-            {
-              "ttl": 1486986805,
-              "response": {
-                "client_id": "x-cecUX***",
-                "client_secret": "x-Br7TR***",
-                "serving_operator": "voda***",
-                "country": "Spain",
-                "currency": "EUR",
-                "client_name": "api***",
-                "apis": {
-                  "operatorid": {
-                    "link": [
-                      {
-                        "href": "https://idp.mobile***/authorize",
-                        "rel": "authorization"
-                      },
-                      {
-                        "href": "https://idp.mobile***/token",
-                        "rel": "token"
-                      },
-                      {
-                        "href": "https://idp.mobile***/userinfo",
-                        "rel": "userinfo"
-                      },
-                      {
-                        "href": "https://idp.mobile***/token",
-                        "rel": "tokenrefresh"
-                      },
-                      {
-                        "href": "https://idp.mobile***/revoke",
-                        "rel": "tokenrevoke"
-                      },
-                      {
-                        "href": "https://idp.mobile***/userinfo",
-                        "rel": "premiuminfo"
-                      }
-                    ]
-                  }
-                }
-              },
-              "subscriber_id": "84e226bdaa***"
-            }
-
-
+      
         **Error Responses**
 
         | Scenario             | Status           | Error                    | Description                 |
