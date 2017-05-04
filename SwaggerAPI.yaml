@@ -1,0 +1,255 @@
+swagger: "2.0"
+
+# Metadata
+info:
+  title: Request Validator API
+  version: "1.0.0"
+  description: Request validator API
+host: discover.mobileconnect.io
+basePath: /rv/v1/exchange/organizations
+schemes:
+  - https
+
+# API Paths
+paths:
+  /{orgID}/validate:
+    get:
+      summary: Request Validator API
+      description: |
+        Serving Operator service delivery platform receives the ‘Exchange client_id‘ and ‘Exchange client_secret‘ on applicable Authentication scheme.
+
+        Serving Operator validates this Exchange credentials using the Serving Operator cache / Request Validator API call.
+
+        The Serving Operator retrieves the Application and Developer data to allow on Authentication Scheme.
+
+
+        **Pre-Requisites - Discovery Call**
+
+        * Before Request validator API call, make Discovery service call to obtain the ‘Exchange client_id and client_secret‘
+
+        Below is a sample response of **Discovery API** call.For further details please refer **Discovery API Documentation**.
+
+            {
+              "ttl": 1486986805,
+              "response": {
+                "client_id": "x-cecUX***",
+                "client_secret": "x-Br7TR***",
+                "serving_operator": "voda***",
+                "country": "Spain",
+                "currency": "EUR",
+                "client_name": "api***",
+                "apis": {
+                  "operatorid": {
+                    "link": [
+                      {
+                        "href": "https://idp.mobile***/authorize",
+                        "rel": "authorization"
+                      },
+                      {
+                        "href": "https://idp.mobile***/token",
+                        "rel": "token"
+                      },
+                      {
+                        "href": "https://idp.mobile***/userinfo",
+                        "rel": "userinfo"
+                      },
+                      {
+                        "href": "https://idp.mobile***/token",
+                        "rel": "tokenrefresh"
+                      },
+                      {
+                        "href": "https://idp.mobile***/revoke",
+                        "rel": "tokenrevoke"
+                      },
+                      {
+                        "href": "https://idp.mobile***/userinfo",
+                        "rel": "premiuminfo"
+                      }
+                    ]
+                  }
+                }
+              },
+              "subscriber_id": "84e226bdaa***"
+            }
+
+
+        **Error Responses**
+
+        | Scenario             | Status           | Error                    | Description                 |
+        |----------------------|----------------------|--------------------------|-----------------------------|
+        | Missing client_id            | 400 Bad Request| Invalid_Request       | Invalid Client-ID |
+        | Missing Authorization Header | 401 Unauthorized| Authentication Failed | Authorization header missing |
+        | Invalid client_secret        | 401 Unauthorized| Unauthorized_Access   | Invalid Client Secret |
+        | Invalid client_id            | 404 Not Found| Not_Found_Entity      | XCredential not found for x-client-id[client ID] and operator[Operator ID] |
+        | Invalid/Unapproved orgID     | 404 Not Found| Not_Found_Entity      | XCredential not found for x-client-id[client ID] and operator[Operator ID] |
+
+      produces:
+        - application/json
+      parameters:
+        - in: path
+          name: orgID
+          description: Server Operator Organization ID as created in the Exchange
+          required: true
+          type: string
+        - in: query
+          name: client_id
+          description: Exchange Client-ID as returned in the Exchange-Discovery API for a valid operator
+          required: true
+          type: string
+        - in: query
+          name: client_secret
+          description: Operatore id
+          required: true
+          type: string
+        - name: Accept
+          in: header
+          description: Accept Type
+          required: true
+          type: string
+          default: application/json
+          enum:
+            - application/json
+            - application/xml
+        - name: Content-Type
+          in: header
+          description: Content Type
+          type: string
+          default: application/xml
+          enum:
+            - x-www-form-urlencoded
+            - application/xml
+      responses:
+        200:
+          description: Success
+          schema:
+            $ref: "#/definitions/responses"
+        400:
+          description: Bad Request
+          schema:
+            $ref: "#/definitions/error400"
+        401:
+          description: Unauthorized
+          schema:
+            $ref: "#/definitions/error401"
+        404:
+          description: Not_Found_Entity
+          schema:
+            $ref: "#/definitions/error404"
+      security:
+        - basicAuth: []
+
+# Security Definitions
+securityDefinitions:
+  basicAuth:
+    type: basic
+
+# Definitions
+definitions:
+  cli_name:
+    type: object
+    properties:
+      name:
+        type: string
+  app_name:
+    type: object
+    properties:
+      name:
+        type: string
+
+  error400:
+    type: object
+    properties:
+      error:
+        type: string
+        description: Invalid_Request
+      description:
+        type: string
+        description: Invalid Client-ID
+
+  error401:
+    type: object
+    properties:
+      error:
+        type: string
+        description: |
+          Error for mising authentication header : "Authentication Failed" | Error for Invalid Client Secret :  "Unauthorized_Access"
+      description:
+        type: string
+        description: |
+          Description for mising authentication header : "Authorization header missing" | Description for invalid client secret :  "Invalid Client Secret"
+
+  error404:
+    type: object
+    properties:
+      error:
+        type: string
+        description: |
+          Error for Invalid client_id : "Not_Found_Entity" | Error for Invalid/Unapproved orgID :  "Not_Found_Entity"
+      description:
+        type: string
+        description: |
+          Description for Invalid client_id  : "XCredential not found for x-client-id[client ID] and operator[Operator ID]" | Description for Invalid/Unapproved orgID :  "XCredential not found for x-client-id[client ID] and operator[Operator ID]"
+  supportedApis:
+    type: array
+    items:
+        $ref: "#/definitions/app_name"
+
+  application:
+    type: object
+    required:
+      - tncStatus
+    properties:
+     appCredId:
+      type: string
+
+     devOrgId:
+      type: string
+      description: Developer Organization ID.
+     devName:
+      type: string
+
+     devId:
+      type: string
+     appName:
+      type: string
+
+     description:
+      type: string
+
+     appStatus:
+      type: string
+
+     devStatus:
+      type: string
+      description:  Developer Status (APPROVED/UNAPPROVED).
+     developerType:
+      type: string
+      description:  Developer type (TRUSTED/UNTRUSTED).
+     tncStatus:
+      type: string
+      description:  Serving Organization Terms and conditions accepted or unaccepted by the developer (ACCEPTED/UNACCEPTED).
+     trustedMode:
+      type: string
+     appType:
+      type: string
+
+     redirectUri:
+      type: string
+     supportedApis:
+      $ref: "#/definitions/supportedApis"
+
+  responses:
+    type: object
+    properties:
+      x_client_id:
+        type: string
+        format: string
+
+      orgId:
+        type: string
+        format: string
+        description: Serving Organization ID
+      client_name:
+        $ref: "#/definitions/cli_name"
+      application:
+        $ref: "#/definitions/application"
