@@ -40,18 +40,12 @@ paths:
           description: Accept Type
           required: true
           type: string
-          default: application/json
-          enum:
-            - application/json
-            - application/xml
+
         - name: Content-Type
           in: header
           description: Content Type
           type: string
-          default: application/xml
-          enum:
-            - x-www-form-urlencoded
-            - application/xml
+
       responses:
         200:
           description: Success
