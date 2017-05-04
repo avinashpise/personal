@@ -15,7 +15,7 @@ paths:
   /{orgID}/validate:
     get:
       summary: Request Validator API
-      description: |
+      description: >-
         Serving Operator service delivery platform receives the ‘Exchange client_id‘ and ‘Exchange client_secret‘ on applicable Authentication scheme.
 
         Serving Operator validates this Exchange credentials using the Serving Operator cache / Request Validator API call.
@@ -171,7 +171,7 @@ definitions:
     properties:
       error:
         type: string
-        description: |
+        description: >-
           Error for mising authentication header : "Authentication Failed" | Error for Invalid Client Secret :  "Unauthorized_Access"
       description:
         type: string
@@ -183,12 +183,12 @@ definitions:
     properties:
       error:
         type: string
-        description: |
-          Error for Invalid client_id : "Not_Found_Entity" | Error for Invalid/Unapproved orgID :  "Not_Found_Entity"
+        description: >-
+          Error for Invalid client_id : "Not_Found_Entity"  Error for Invalid/Unapproved orgID :  "Not_Found_Entity"
       description:
         type: string
-        description: |
-          Description for Invalid client_id  : "XCredential not found for x-client-id[client ID] and operator[Operator ID]" | Description for Invalid/Unapproved orgID :  "XCredential not found for x-client-id[client ID] and operator[Operator ID]"
+        description: >-
+          Description for Invalid client_id  : "XCredential not found for x-client-id[client ID] and operator[Operator ID]"  Description for Invalid/Unapproved orgID :  "XCredential not found for x-client-id[client ID] and operator[Operator ID]"
   supportedApis:
     type: array
     items:
