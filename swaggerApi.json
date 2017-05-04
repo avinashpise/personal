@@ -109,20 +109,20 @@ definitions:
           
       description:
         type: string
-        description: >-
-          Description for mising authentication header 
+        description:  Description for mising authentication header 
+         
 
   error404:
     type: object
     properties:
       error:
         type: string
-        description: >-
-          Error for Invalid client_id 
+        description:   Error for Invalid client_id 
+        
       description:
         type: string
-        description: >-
-          Description for Invalid client_id  
+        description:  Description for Invalid client_id  
+         
   supportedApis:
     type: array
     items:
