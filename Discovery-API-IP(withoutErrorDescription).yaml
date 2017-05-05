@@ -1,0 +1,148 @@
+swagger: '2.0'
+
+# Metadata
+info:
+  title: Discovery APIs IP
+  version: 1.0.0
+  description: |
+        Documentation of GSMA Discovery APIs
+host: discover.mobileconnect.io
+schemes:
+- https
+
+# API Paths
+paths:
+  /{org_name}/v2/discovery:
+    get:
+      operationId: IP-DISCOVERY-GET
+      summary: Fetching Operator Detail from IP Discovery
+      description: |
+        A discovery request is made by the application 'X-Using-Mobile-Data: true' header.
+      produces:
+      - application/json
+      parameters:
+        - name: org_name
+          in: path
+          description: Organization Name
+          required: true
+          type: string
+        - name: Accept
+          in: header
+          description: Accept Type
+          required: true
+          type: string
+          default: application/json
+          enum:
+            - application/json
+            - application/xml
+        - name: X-Using-Mobile-Data
+          in: header
+          description: X-Using-Mobile-Data
+          required: true
+          type: boolean
+        - name: X-Source-IP
+          in: header
+          description: X-Source-IP
+          required: true
+          type: string
+        - name: Redirect_URL
+          in: query
+          description: Redirect URL
+          required: true
+          type: string
+      security:
+      - BasicAuth: []
+      responses:
+        200:
+          description: Success
+          schema:
+            $ref: "#/definitions/IP_Discovery_Resp"
+        202:
+          description: Accepted
+          schema:
+            $ref: "#/definitions/IP_Discovery_OpSelection_Resp"
+        400:
+          description: Bad Request
+          schema:
+            $ref: "#/definitions/DiscoveryError"
+        401:
+          description: Unauthorized
+          schema:
+            $ref: "#/definitions/DiscoveryError"
+
+# Security Definitions
+securityDefinitions:
+  BasicAuth:
+    type: basic
+
+# Definitions
+definitions:
+  IP_Discovery_Resp:
+    type: object
+    properties:
+      ttl:
+        type: integer
+        format: int64
+        description: Time To Live
+      response:
+        type: object
+        properties:
+          client_id:
+            type: string
+            description: X-Client ID
+          client_secret:
+            type: string
+            description: X-Client Secret
+          serving_operator:
+            type: string
+            description: Serving Operator
+          country:
+            type: string
+            description: Country
+          currency:
+            type: string
+            description: Currency
+          client_name:
+            type: string
+            description: Client Name
+          apis:
+            type: object
+            description: List of Operator APIs
+            properties:
+              operatorid:
+                type: object
+                properties:
+                  link:
+                    type: array
+                    description: Array of Operator API Links
+                    items:
+                      $ref: "#/definitions/OperatorLink"
+
+  IP_Discovery_OpSelection_Resp:
+    type: object
+    properties:
+      links:
+        type: array
+        description: Array of Operator API Links
+        items:
+          $ref: "#/definitions/OperatorLink"
+
+  OperatorLink:
+    type: object
+    properties:
+      href:
+        type: string
+        description: Method API
+      rel:
+        type: string
+        description: Method Name
+
+  DiscoveryError:
+    type: object
+    properties:
+      error:
+        type: string
+        description: Invalid_Request for Missing Redirect_URL scenario | "Unauthorized_Access" for Missing Authorization Header scenario
+      description:
+        type: string
+        description: Redirect_URL missing for Missing Redirect_URL scenario | "Your request needs a valid session or valid credentials" for Missing Authorization Header scenario

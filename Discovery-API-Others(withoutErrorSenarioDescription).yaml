@@ -1,0 +1,158 @@
+swagger: '2.0'
+
+# Metadata
+info:
+  title: Discovery APIs Others
+  version: 1.0.0
+  description: |
+        Documentation of GSMA Discovery APIs
+host: discover.mobileconnect.io
+schemes:
+- https
+
+# API Paths
+paths:
+  /{org_name}/v2/discovery/operator-selection:
+    get:
+      operationId: SESSION-DISCOVERY-GET
+      summary: Validating Session ID
+      description: |
+        Validating Session ID
+      parameters:
+        - name: org_name
+          in: path
+          description: Organization Name
+          required: true
+          type: string
+        - name: Accept
+          in: header
+          description: Accept Type
+          required: true
+          type: string
+          default: text/html
+          enum:
+            - text/html
+        - name: session_id
+          in: query
+          description: Session ID
+          required: true
+          type: string
+      responses:
+        302:
+          description: Redirect to the Redirect_URI
+
+  /{org_name}/v2/discovery/msisdn-submit:
+    post:
+      operationId: MSISDN-SUBMIT
+      summary: Redirect to URL from UI
+      description: |
+        Redirect to URL from UI
+      parameters:
+        - name: org_name
+          in: path
+          description: Organization Name
+          required: true
+          type: string
+        - name: Accept
+          in: header
+          description: Accept Type
+          required: true
+          type: string
+          default: text/html
+          enum:
+            - text/html
+        - name: Content-Type
+          in: header
+          description: Content Type
+          type: string
+          default: x-www-form-urlencoded
+          enum:
+            - x-www-form-urlencoded
+        - name: body
+          in: body
+          description: Request Body
+          required: true
+          schema:
+            type: object
+            properties:
+              session_id:
+                type: string
+                description: Session ID
+              discovery_token:
+                type: string
+                description: Discovery token
+              nonce:
+                type: string
+                description: Nonce
+              MSISDN:
+                type: string
+                description: MSISDN with Country Code
+              accept-terms:
+                type: string
+                description: Remember Me
+                enum:
+                  - on
+      responses:
+        302:
+          description: Redirect to the Redirect_URI
+
+  /{org_name}/v2/discovery/operator-submit:
+    post:
+      operationId: OPERATOR-SUBMIT
+      summary: Redirect to URL from UI
+      description: |
+        Redirect to URL from UI
+      parameters:
+        - name: org_name
+          in: path
+          description: Organization Name
+          required: true
+          type: string
+        - name: Accept
+          in: header
+          description: Accept Type
+          required: true
+          type: string
+          default: text/html
+          enum:
+            - text/html
+        - name: Content-Type
+          in: header
+          description: Content Type
+          type: string
+          default: x-www-form-urlencoded
+          enum:
+            - x-www-form-urlencoded
+        - name: body
+          in: body
+          description: Request Body
+          required: true
+          schema:
+            type: object
+            properties:
+              session_id:
+                type: string
+                description: Session ID
+              discovery_token:
+                type: string
+                description: Discovery token
+              nonce:
+                type: string
+                description: Nonce
+              region:
+                type: integer
+                description: Region code
+              country:
+                type: string
+                description: Country code
+              operator:
+                type: string
+                description: Operator Name
+              accept-terms:
+                type: string
+                description: Remember Me
+                enum:
+                  - on
+      responses:
+        302:
+          description: Redirect to the Redirect_URI

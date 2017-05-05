@@ -1,0 +1,174 @@
+swagger: '2.0'
+
+# Metadata
+info:
+  title: Discovery APIs MSISDN
+  version: 1.0.0
+  description: |
+        Documentation of GSMA Discovery APIs
+
+        **Error Responses** (Common across APIs)
+
+        | Scenario             | Status          | Error                    | Description                 |
+        |----------------------|----------------------|--------------------------|-----------------------------|
+        | Missing Redirect_URL         | 400 Bad Request | Invalid_Request     | Redirect_URL missing |
+        | Missing Authorization Header | 401 Unauthorised | Unauthorized_Access | Your request needs a valid session or valid credentials |
+        | Wrong msisdn                 | 404 Not Found | Not_Found_Entity    | We could not find your operator based on the MSISDN supplied |
+        | Unsupported msisdn           | 404 Not Found | Not_Found_Entity    | Operator not supported for the MSISDN supplied |
+host: discover.mobileconnect.io
+schemes:
+- https
+
+# API Paths
+paths:
+  /{org_name}/v2/discovery:
+    post:
+      operationId: MSISDN-DISCOVERY-POST
+      summary: Posting Operator Detail from MSISDN Discovery
+      description: |
+        **Valid Responses**
+
+        | Scenario             | Parameters           | Status Code              | Description                 |
+        |----------------------|----------------------|--------------------------|-----------------------------|
+        | With MSISDN          | msisdn, Redirect_URL    | 200 | Direct discovery response with cookies set. Note the Enum-Nonce cookie - this is returned only for MSISDN based discovery. Also note the subscriber_id parameter in the response payload |
+        | With MSISDN, Ignore-Cookies | Redirect_URL | 200 | Same as above |
+        | With out MSISDN      | Redirect_URL | 202 | Get the operator selection web page |
+      produces:
+      - application/json
+      parameters:
+        - name: org_name
+          in: path
+          description: Organization Name
+          required: true
+          type: string
+        - name: Accept
+          in: header
+          description: Accept Type
+          required: true
+          type: string
+          default: application/json
+          enum:
+            - application/json
+            - application/xml
+        - name: Content-Type
+          in: header
+          description: Content Type
+          type: string
+          default: x-www-form-urlencoded
+          enum:
+            - x-www-form-urlencoded
+        - name: body
+          in: body
+          description: Request Body
+          required: true
+          schema:
+            type: object
+            properties:
+              msisdn:
+                type: integer
+                format: int64
+              Redirect_URL:
+                type: string
+      security:
+      - BasicAuth: []
+      responses:
+        200:
+          description: Successful response
+          schema:
+            $ref: "#/definitions/MSISDN_Discovery_Resp"
+        202:
+          description: Accepted
+          schema:
+            $ref: "#/definitions/MSISDN_Discovery_OpSelection_Resp"
+        400:
+          description: Bad Request
+          schema:
+            $ref: "#/definitions/DiscoveryError"
+        401:
+          description: Unauthorized
+          schema:
+            $ref: "#/definitions/DiscoveryError"
+        404:
+          description: Not Found (Wrong or Unsupported msisdn)
+          schema:
+            $ref: "#/definitions/DiscoveryError"
+
+# Security Definitions
+securityDefinitions:
+  BasicAuth:
+    type: basic
+
+# Definitions
+definitions:
+  MSISDN_Discovery_Resp:
+    type: object
+    properties:
+      ttl:
+        type: integer
+        format: int64
+        description: Time To Live
+      response:
+        type: object
+        properties:
+          client_id:
+            type: string
+            description: X-Client ID
+          client_secret:
+            type: string
+            description: X-Client Secret
+          serving_operator:
+            type: string
+            description: Serving Operator
+          country:
+            type: string
+            description: Country
+          currency:
+            type: string
+            description: Currency
+          client_name:
+            type: string
+            description: Client Name
+          subscriber_id:
+            type: string
+            description: MSISDN - provided msisdn either in the case of POST MSISDN or POST UI MSISDN, 'pipe' character. padding - random string of 16 chars used to bulk out the payload semicolon character. ApiAction - MSISDN, UI-MSISDN in the encrypted format.
+          apis:
+            type: object
+            description: List of Operator APIs
+            properties:
+              operatorid:
+                type: object
+                properties:
+                  link:
+                    type: array
+                    description: Array of Operator API Links
+                    items:
+                      $ref: "#/definitions/OperatorLink"
+
+  MSISDN_Discovery_OpSelection_Resp:
+    type: object
+    properties:
+      links:
+        type: array
+        description: Array of Operator API Links
+        items:
+          $ref: "#/definitions/OperatorLink"
+
+  OperatorLink:
+    type: object
+    properties:
+      href:
+        type: string
+        description: Method API
+      rel:
+        type: string
+        description: Method Name
+
+  DiscoveryError:
+    type: object
+    properties:
+      error:
+        type: string
+        description: Invalid_Request for Missing Redirect_URL scenario | "Unauthorized_Access" for Missing Authorization Header scenario | "Not_Found_Entity" for Wrong msisdn and Unsupported msisdn scenarios
+      description:
+        type: string
+        description: Redirect_URL missing for Missing Redirect_URL scenario | "Your request needs a valid session or valid credentials" for Missing Authorization Header scenario | "We could not find your operator based on the MSISDN supplied" for Wrong msisdn scenario and "Operator not supported for the MSISDN supplied" for Unsupported msisdn scenario
