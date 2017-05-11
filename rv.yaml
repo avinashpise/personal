@@ -1,0 +1,281 @@
+swagger: "2.0"
+
+# Metadata
+info:
+  title: Request Validator API
+  version: "1.0.0"
+  description: >-
+      **Pre-requisites for request validator api- Discovery Call**
+
+
+      Before Request validator API call, make Discovery service call to obtain the ID Gateway **client_id** and **client_secret**
+
+
+        Below is a sample response of **Discovery API** call. For further details please refer **Discovery API Documentation**.
+
+            {
+              "ttl": 1498963352,
+              "response": {
+                "client_id": "x-ce******",
+                "client_secret": "x-Br******",
+                "serving_operator": "vodafone_spain",
+                "country": "Spain",
+                "currency": "EUR",
+                "client_name": "apigee_test_3",
+                "apis": {
+                  "operatorid": {
+                    "link": [
+                      {
+                        "href": "https://idp.mobileconnect.gemalto.com/idp/vodafonespain/oidc/mc/authorize",
+                        "rel": "authorization"
+                      },
+                      {
+                        "href": "https://idp.mobileconnect.gemalto.com/idp/vodafonespain/oidc/mc/token",
+                        "rel": "token"
+                      },
+                      {
+                        "href": "https://idp.mobileconnect.gemalto.com/idp/vodafonespain/oidc/mc/userinfo",
+                        "rel": "userinfo"
+                      },
+                      {
+                        "href": "https://idp.mobileconnect.gemalto.com/idp/vodafonespain/oidc/mc/token",
+                        "rel": "tokenrefresh"
+                      },
+                      {
+                        "href": "https://idp.mobileconnect.gemalto.com/idp/vodafonespain/oidc/mc/revoke",
+                        "rel": "tokenrevoke"
+                      },
+                      {
+                        "href": "https://idp.mobileconnect.gemalto.com/idp/vodafonespain/oidc/mc/userinfo",
+                        "rel": "premiuminfo"
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+
+
+host: discover.mobileconnect.io
+basePath: /rv/v1/exchange/organizations
+schemes:
+  - https
+
+# API Paths
+paths:
+  /{orgID}/validate:
+    get:
+      summary: Request Validator API
+      description: |
+        Serving organization service delivery platform receives the "ID Gateway client_id and client_secret" on applicable Authentication scheme.
+
+        Serving organization validates this ID Gateway credentials using the Serving organization cache/Request Validator API call.
+
+        The Serving Organization retrieves the Application and Developer data to allow on Authentication Scheme.
+        
+        **Valid Response**
+        
+        Below will be the success response for valid request
+        
+            {
+              "x_client_id": "x-ce******",
+              "orgId": "vodafone_spain",
+              "application": {
+                "appCredId": "f08da69a-a325-11e4-9ed8-dfa65b5c4203",
+                "devOrgId": "apigee_monitor",
+                "devName": "Apigee Monitor",
+                "devId": "b4cbd4fa-a317-11e4-8b79-f5ed6bafda6a",
+                "appName": "APIHealth",
+                "description": "Exchange Monitoring using API Health",
+                "appStatus": "APPROVED",
+                "devStatus": "Approved",
+                "developerType": "UNTRUSTED",
+                "tncStatus": "UNACCEPTED",
+                "trustedMode": 999,
+                "appType": "DEVELOPMENT",
+                "redirectUri": "https://api.exchange.gsma.com",
+                "supportedApis": [
+                  {
+                    "name": "operatorid"
+                  }
+                ]
+              },
+              "client_name": {
+                "name": "apigee_test_3"
+              }
+            }        
+
+        **Error Scenarios**
+        
+        Below will be the error scenarios for invalid api call
+
+          | Scenario             | Status           | Error                    | Description                 |
+          |----------------------|----------------------|--------------------------|-----------------------------|
+          | Missing client_id            | 400 Bad Request| Invalid_Request       | Invalid client_id |
+          | Missing Authorization Header | 401 Unauthorized| Authentication Failed | Authorization header missing |
+          | Invalid client_secret        | 401 Unauthorized| Unauthorized_Access   | Invalid client_secret |
+          | Invalid client_id            | 404 Not Found| Not_Found_Entity      | XCredential not found for x-client-id[client ID] and operator[Operator ID] |
+          | Invalid/Unapproved orgID     | 404 Not Found| Not_Found_Entity      | XCredential not found for x-client-id[client ID] and operator[Operator ID] |
+
+
+      produces:
+        - application/json
+      parameters:
+        - in: path
+          name: orgID
+          description: Serving Organization ID as created in the Exchange
+          required: true
+          type: string
+        - in: query
+          name: client_id
+          description: ID Gateway client_id as returned in the Exchange-Discovery API for a valid operator
+          required: true
+          type: string
+        - in: query
+          name: client_secret
+          description: ID Gateway client_secret as returned in the Exchange-Discovery API for a valid operator
+          required: true
+          type: string
+        - name: Accept
+          in: header
+          description: Accept Type
+          required: true
+          type: string
+          default: application/json
+          enum:
+            - application/json
+            - application/xml
+        - name: Content-Type
+          in: header
+          description: Content Type
+          type: string
+          default: application/xml
+          enum:
+            - x-www-form-urlencoded
+            - application/xml
+      responses:
+        200:
+          description: Success
+          schema:
+            $ref: '#/definitions/responses'
+        400:
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/error400'
+        401:
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/error401'
+        404:
+          description: Not_Found_Entity
+          schema:
+            $ref: '#/definitions/error404'
+      security:
+        - basicAuth: []
+
+# Security Definitions
+securityDefinitions:
+  basicAuth:
+    type: basic
+
+# Definitions
+definitions:
+  name:
+    type: object
+    properties:
+      name:
+        type: string
+        
+  error400:
+    type: object
+    properties:
+      error:
+        type: string
+        description: Invalid_Request
+      description:
+        type: string
+        description: Invalid client_id
+
+  error401:
+    type: object
+    properties:
+      error:
+        type: string
+        description: |
+          Error for mising authentication header : "Authentication Failed" | Error for Invalid client_secret :  "Unauthorized_Access"
+      description:
+        type: string
+        description: |
+          Description for mising authentication header : "Authorization header missing" | Description for invalid client_secret :  "Invalid Client Secret"
+
+  error404:
+    type: object
+    properties:
+      error:
+        type: string
+        description: |
+          Error for Invalid client_id : "Not_Found_Entity" | Error for Invalid/Unapproved orgID :  "Not_Found_Entity"
+      description:
+        type: string
+        description: |
+          Description for Invalid client_id  : "XCredential not found for x-client-id[client ID] and operator[Operator ID]" | Description for Invalid/Unapproved orgID :  "XCredential not found for x-client-id[client ID] and operator[Operator ID]"
+  responses:
+    type: object
+    properties:
+      x_client_id:
+        type: string
+        format: string
+        example:
+          x-ce******
+      orgId:
+        type: string
+        format: string
+        description: Serving Organization ID
+        example:
+          vodafone_spain
+      application:
+        type: object
+        required:
+          - tncStatus
+        properties:
+         appCredId:
+          type: string
+         devOrgId:
+          type: string
+          description: Developer Organization ID.
+         devName:
+          type: string
+         devId:
+          type: string
+         appName:
+          type: string
+         description:
+          type: string
+         appStatus:
+          type: string
+         devStatus:
+          type: string
+          description:  Developer Status (APPROVED/UNAPPROVED).
+         developerType:
+          type: string
+          description:  Developer type (TRUSTED/UNTRUSTED).
+         tncStatus:
+          type: string
+          description:  Serving Organization Terms and conditions accepted or unaccepted by the developer (ACCEPTED/UNACCEPTED).
+         trustedMode:
+          type: string
+         appType:
+          type: string
+         redirectUri:
+          type: string
+         supportedApis:
+          type: array
+          items:
+            $ref: '#/definitions/name'
+      client_name:
+        type: object
+        properties: 
+           name:
+            type: string
+            example:
+             apigee_test_3
