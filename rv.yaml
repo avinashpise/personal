@@ -185,6 +185,7 @@ definitions:
     properties:
       name:
         type: string
+        example: operatorid
         
   error400:
     type: object
@@ -192,9 +193,11 @@ definitions:
       error:
         type: string
         description: Invalid_Request
+        example: Invalid_Request
       description:
         type: string
         description: Invalid client_id
+        example: Invalid client_id
 
   error401:
     type: object
@@ -203,11 +206,13 @@ definitions:
         type: string
         description: |
           Error for mising authentication header : "Authentication Failed" | Error for Invalid client_secret :  "Unauthorized_Access"
+        example: Authentication Failed
       description:
         type: string
         description: |
           Description for mising authentication header : "Authorization header missing" | Description for invalid client_secret :  "Invalid Client Secret"
-
+        example: Authorization header missing
+        
   error404:
     type: object
     properties:
@@ -215,10 +220,12 @@ definitions:
         type: string
         description: |
           Error for Invalid client_id : "Not_Found_Entity" | Error for Invalid/Unapproved orgID :  "Not_Found_Entity"
+        example: Not_Found_Entity
       description:
         type: string
         description: |
           Description for Invalid client_id  : "XCredential not found for x-client-id[client ID] and operator[Operator ID]" | Description for Invalid/Unapproved orgID :  "XCredential not found for x-client-id[client ID] and operator[Operator ID]"
+        example: XCredential not found for x-client-id[client ID] and operator[Operator ID]"
   responses:
     type: object
     properties:
@@ -240,42 +247,80 @@ definitions:
         properties:
          appCredId:
           type: string
+          description: A unique Developer App Credential Identifier
+          example: f08da69a-a325-11e4-9ed8-dfa65b5c4203
+          
          devOrgId:
           type: string
-          description: Developer Organization ID.
+          description: Developer Organization identifier
+          example: apigee_monitor
+          
          devName:
           type: string
+          description: Name of the developer
+          example: Apigee Monitor
+          
          devId:
           type: string
+          description: Developer's Id
+          example: b4cbd4fa-a317-11e4-8b79-f5ed6bafda6a
+          
          appName:
           type: string
+          description: Application name
+          example: APIHealth
+          
          description:
           type: string
+          description: Application Description
+          example: Exchange Monitoring using API Health
+          
          appStatus:
           type: string
+          description: Application's current status (APPROVED, UNAPPROVED, REVOKED or REJECTED)
+          example: APPROVED
+          
          devStatus:
           type: string
-          description:  Developer Status (APPROVED/UNAPPROVED).
+          description:  Developer's current status (APPROVED, UNAPPROVED, REVOKED or REJECTED).
+          example: Approved
+          
          developerType:
           type: string
           description:  Developer type (TRUSTED/UNTRUSTED).
+          example: UNTRUSTED
+          
          tncStatus:
           type: string
           description:  Serving Organization Terms and conditions accepted or unaccepted by the developer (ACCEPTED/UNACCEPTED).
+          example: UNACCEPTED
+          
          trustedMode:
           type: string
+          description: level of trust
+          example: 999
+          
          appType:
           type: string
+          description: Application's type (PRODUCTION or DEVELOPMENT)
+          example: DEVELOPMENT
+          
          redirectUri:
           type: string
+          description: Applications redirect URI
+          example: https://api.exchange.gsma.com
+          
          supportedApis:
           type: array
+          description: JSON Array of the APIs used by the Application
           items:
             $ref: '#/definitions/name'
+            
       client_name:
         type: object
         properties: 
            name:
             type: string
+            description: It is a application client name.
             example:
              apigee_test_3
