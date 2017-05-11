@@ -67,9 +67,9 @@ paths:
     get:
       summary: Request Validator API
       description: |
-        Serving organization service delivery platform receives the "ID Gateway client_id and client_secret" on applicable Authentication scheme.
+        Serving organization service delivery platform receives the ID Gateway "client_id" and "client_secret" on applicable Authentication scheme.
 
-        Serving organization validates this ID Gateway credentials using the Serving organization cache/Request Validator API call.
+        Serving organization validates this ID Gateway credentials using the Serving organization cache or Request Validator API call.
 
         The Serving Organization retrieves the Application and Developer data to allow on Authentication Scheme.
         
@@ -107,7 +107,7 @@ paths:
 
         **Error Scenarios**
         
-        Below will be the error scenarios for invalid api call
+        Below will be the error scenarios for invalid request
 
           | Scenario             | Status           | Error                    | Description                 |
           |----------------------|----------------------|--------------------------|-----------------------------|
@@ -138,21 +138,12 @@ paths:
           type: string
         - name: Accept
           in: header
-          description: Accept Type
+          description: Content-Types that are acceptable for the response.
           required: true
           type: string
           default: application/json
           enum:
             - application/json
-            - application/xml
-        - name: Content-Type
-          in: header
-          description: Content Type
-          type: string
-          default: application/xml
-          enum:
-            - x-www-form-urlencoded
-            - application/xml
       responses:
         200:
           description: Success
