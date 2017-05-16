@@ -73,37 +73,6 @@ paths:
 
         The Serving Organization retrieves the Application and Developer data to allow on Authentication Scheme.
         
-        **Valid Response**
-        
-        Below will be the success response for valid request
-        
-            {
-              "x_client_id": "x-ce******",
-              "orgId": "vodafone_spain",
-              "application": {
-                "appCredId": "f08da69a-a325-11e4-9ed8-dfa65b5c4203",
-                "devOrgId": "apigee_monitor",
-                "devName": "Apigee Monitor",
-                "devId": "b4cbd4fa-a317-11e4-8b79-f5ed6bafda6a",
-                "appName": "APIHealth",
-                "description": "Exchange Monitoring using API Health",
-                "appStatus": "APPROVED",
-                "devStatus": "Approved",
-                "developerType": "UNTRUSTED",
-                "tncStatus": "UNACCEPTED",
-                "trustedMode": 999,
-                "appType": "DEVELOPMENT",
-                "redirectUri": "https://api.exchange.gsma.com",
-                "supportedApis": [
-                  {
-                    "name": "operatorid"
-                  }
-                ]
-              },
-              "client_name": {
-                "name": "apigee_test_3"
-              }
-            }        
 
         **Error Scenarios**
         
