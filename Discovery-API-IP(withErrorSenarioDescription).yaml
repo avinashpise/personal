@@ -18,6 +18,7 @@ paths:
       summary: Fetching Operator Detail from IP Discovery
       description: |
         A discovery request is made by the application 'X-Using-Mobile-Data: true' header.
+        
         **Valid Responses**
 
         | Scenario                 | Parameters                    | Status Code | Description                 |
@@ -36,12 +37,12 @@ paths:
       parameters:
         - name: org_name
           in: path
-          description: Organization Name
+          description: Serving Organization ID as created in the Exchange
           required: true
           type: string
         - name: Accept
           in: header
-          description: Accept Type
+          description: Content-Types that are acceptable for the response.
           required: true
           type: string
           default: application/json
@@ -50,27 +51,23 @@ paths:
             - application/xml
         - name: X-Using-Mobile-Data
           in: header
-          description: X-Using-Mobile-Data
+          description: X-Using-Mobile-Data boolean value
           required: true
           type: boolean
         - name: X-Source-IP
           in: header
-          description: X-Source-IP
+          description: X-Source-IP Address
           required: true
           type: string
         - name: Redirect_URL
           in: query
-          description: Redirect URL
+          description: Redirect URL of application
           required: true
           type: string
       security:
       - BasicAuth: []
       responses:
         200:
-          description: Success
-          schema:
-            $ref: "#/definitions/IP_Discovery_Resp"
-        202:
           description: Accepted
           schema:
             $ref: "#/definitions/IP_Discovery_OpSelection_Resp"
@@ -90,47 +87,6 @@ securityDefinitions:
 
 # Definitions
 definitions:
-  IP_Discovery_Resp:
-    type: object
-    properties:
-      ttl:
-        type: integer
-        format: int64
-        description: Time To Live
-      response:
-        type: object
-        properties:
-          client_id:
-            type: string
-            description: X-Client ID
-          client_secret:
-            type: string
-            description: X-Client Secret
-          serving_operator:
-            type: string
-            description: Serving Operator
-          country:
-            type: string
-            description: Country
-          currency:
-            type: string
-            description: Currency
-          client_name:
-            type: string
-            description: Client Name
-          apis:
-            type: object
-            description: List of Operator APIs
-            properties:
-              operatorid:
-                type: object
-                properties:
-                  link:
-                    type: array
-                    description: Array of Operator API Links
-                    items:
-                      $ref: "#/definitions/OperatorLink"
-
   IP_Discovery_OpSelection_Resp:
     type: object
     properties:
@@ -143,12 +99,14 @@ definitions:
   OperatorLink:
     type: object
     properties:
-      href:
-        type: string
-        description: Method API
       rel:
         type: string
-        description: Method Name
+        description: Method Name 
+        example: operatorSelection
+      href:
+        type: string
+        description: Method API url
+        example: https://exchange-i-test.dn.apigee.net/apigee_monitor/v2/discovery/operator-selection?session_id=U7GXhTcpDAiLNJPpst6B4ai1rclnlVYe5h23UQMX6DweaRdEew&ext_session_id=3qb0qnoIqXz4mCFbiYsCMgmcRLytBhZVCDB51zpUPdg1PIAVx561pb0Yavusucb6Aa88T3YUhEipljhwpnnVggs6kNx5qOv0s1XcG6%2FPCxarmE%2Bs9qbl
 
   DiscoveryError:
     type: object
@@ -156,6 +114,8 @@ definitions:
       error:
         type: string
         description: Invalid_Request for Missing Redirect_URL scenario | "Unauthorized_Access" for Missing Authorization Header scenario
+        example: Invalid_Request
       description:
         type: string
         description: Redirect_URL missing for Missing Redirect_URL scenario | "Your request needs a valid session or valid credentials" for Missing Authorization Header scenario
+        example: Redirect_URL missing
