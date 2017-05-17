@@ -20,14 +20,17 @@ paths:
         A discovery request is made by the application 'X-Using-Mobile-Data: true' header.
         
         **Valid Responses**
+        
+        Below will be the response for valid request
 
         | Scenario                 | Parameters                    | Status Code | Description                 |
         |--------------------------|-------------------------------|-------------|-----------------------------|
-        | With X-Source-IP         | Local-Client-IP, Redirect_URL | 200 | Provides Operator Details |
-        | With invalid X-Source-IP | Redirect_URL                  | 202 | Get the operator selection web page |
+        | With X-Source-IP | Redirect_URL                  | 202 | Get the operator selection web page |
 
         **Error Responses**
-
+        
+         Below will be the response for valid request
+         
         | Scenario                     | Status           | Error               | Description                 |
         |------------------------------|------------------|---------------------|-----------------------------|
         | Missing Redirect_URL         | 400 Bad Request  | Invalid_Request     | Redirect_URL missing |
