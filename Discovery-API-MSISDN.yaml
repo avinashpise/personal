@@ -1,0 +1,196 @@
+swagger: '2.0'
+
+# Metadata
+info:
+  title: Discovery APIs MSISDN
+  version: 1.0.0
+  description: |
+        Documentation of GSMA Discovery APIs
+
+host: discover.mobileconnect.io
+schemes:
+- https
+
+# API Paths
+paths:
+  /{org_name}/v2/discovery:
+    post:
+      operationId: MSISDN-DISCOVERY-POST
+      summary: Posting Operator Detail from MSISDN Discovery
+      description: |
+        **Valid Responses**
+        
+        Below will be the response for valid request
+
+        | Scenario             | Parameters           | Status Code              | Description                 |
+        |----------------------|----------------------|--------------------------|-----------------------------|
+        | With MSISDN          | msisdn, Redirect_URL    | 200 | Direct discovery response with cookies set. Note the Enum-Nonce cookie - this is returned only for MSISDN based discovery. Also note the subscriber_id parameter in the response payload |
+        | With MSISDN, Ignore-Cookies | Redirect_URL | 200 | Same as above |
+        | With out MSISDN      | Redirect_URL | 202 | Get the operator selection web page |
+        
+        
+        **Error Responses** 
+        
+        Below will be the response for invalid request
+
+        | Scenario             | Status          | Error                    | Description                 |
+        |----------------------|----------------------|--------------------------|-----------------------------|
+        | Missing Redirect_URL         | 400 Bad Request | Invalid_Request     | Redirect_URL missing |
+        | Missing Authorization Header | 401 Unauthorised | Unauthorized_Access | Your request needs a valid session or valid credentials |
+        | Wrong msisdn                 | 404 Not Found | Not_Found_Entity    | We could not find your operator based on the MSISDN supplied |
+        | Unsupported msisdn           | 404 Not Found | Not_Found_Entity    | Operator not supported for the MSISDN supplied |
+      produces:
+      - application/json
+      parameters:
+        - name: org_name
+          in: path
+          description: Serving Organization Name
+          required: true
+          type: string
+        - name: Accept
+          in: header
+          description: Content-Types that are acceptable for the response
+          required: true
+          type: string
+          default: application/json
+          enum:
+            - application/json
+            - application/xml
+        - name: Content-Type
+          in: header
+          description: Content Type
+          type: string
+          default: x-www-form-urlencoded
+          enum:
+            - x-www-form-urlencoded
+        - name: body
+          in: body
+          description: Request Body
+          required: true
+          schema:
+            type: object
+            properties:
+              msisdn:
+                type: integer
+                format: int64
+                description: The msisdn number is the telephone number that is assigned to a mobile user with MCC as a prefix
+                example: 34607123000
+              Redirect_URL:
+                type: string
+                description: Redirect_URL for application
+                example: http://apigee.com
+      security:
+      - BasicAuth: []
+      responses:
+        200:
+          description: Successful response
+          schema:
+            $ref: "#/definitions/MSISDN_Discovery_Resp"
+        202:
+          description: Accepted
+          schema:
+            $ref: "#/definitions/MSISDN_Discovery_OpSelection_Resp"
+        400:
+          description: Bad Request
+          schema:
+            $ref: "#/definitions/DiscoveryError"
+        401:
+          description: Unauthorized
+          schema:
+            $ref: "#/definitions/DiscoveryError"
+        404:
+          description: Not Found (Wrong or Unsupported msisdn)
+          schema:
+            $ref: "#/definitions/DiscoveryError"
+
+# Security Definitions
+securityDefinitions:
+  BasicAuth:
+    type: basic
+
+# Definitions
+definitions:
+  MSISDN_Discovery_Resp:
+    type: object
+    properties:
+      ttl:
+        type: integer
+        format: int64
+        description: Time To Live of data in a computer or network in miliseconds
+        example: 1498963352
+      response:
+        type: object
+        properties:
+          client_id:
+            type: string
+            description: ID Gateway client_id as returned in the Exchange-Discovery API for a valid operator
+            example: X-c******
+          client_secret:
+            type: string
+            description: ID Gateway client_secret as returned in the Exchange-Discovery API for a valid operator
+            example: X-Br******
+          serving_operator:
+            type: string
+            description: Serving Operator as created in the Exchange
+            example: vodafone_spain
+          country:
+            type: string
+            description: Country of Serving Operator
+            example: Spain
+          currency:
+            type: string
+            description: Currency of Serving Operator Country
+            example: EUR
+          client_name:
+            type: string
+            description: Client Name of Serving Operator
+            example: apigee_test_3
+          subscriber_id:
+            type: string
+            description: MSISDN - provided msisdn either in the case of POST MSISDN or POST UI MSISDN, 'pipe' character. padding - random string of 16 chars used to bulk out the payload semicolon character. ApiAction - MSISDN, UI-MSISDN in the encrypted format.
+            example: 2D4B******
+          apis:
+            type: object
+            description: List of Operator APIs
+            properties:
+              operatorid:
+                type: object
+                properties:
+                  link:
+                    type: array
+                    description: Array of Operator API Links
+                    items:
+                      $ref: "#/definitions/OperatorLink"
+
+  MSISDN_Discovery_OpSelection_Resp:
+    type: object
+    properties:
+      links:
+        type: array
+        description: Array of Operator API Links
+        items:
+          $ref: "#/definitions/OperatorLink"
+
+  OperatorLink:
+    type: object
+    properties:
+      href:
+        type: string
+        description: Method API
+        example: https://idp.mobileconnect.gemalto.com/idp/vodafonespain/oidc/mc/authorize
+      rel:
+        type: string
+        description: Method Name
+        example: authorization
+
+  DiscoveryError:
+    type: object
+    properties:
+      error:
+        type: string
+        description: Invalid_Request for Missing Redirect_URL scenario | "Unauthorized_Access" for Missing Authorization Header scenario | "Not_Found_Entity" for Wrong msisdn and Unsupported msisdn scenarios
+        example: Unauthorized_Access
+      description:
+        type: string
+        example: Your request needs a valid session or valid credentials
+        description: Redirect_URL missing for Missing Redirect_URL scenario | "Your request needs a valid session or valid credentials" for Missing Authorization Header scenario | "We could not find your operator based on the MSISDN supplied" for Wrong msisdn scenario and "Operator not supported for the MSISDN supplied" for Unsupported msisdn scenario
