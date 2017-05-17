@@ -172,6 +172,8 @@ paths:
                 example: 01
               Redirect_URL:
                 type: string
+                description: Redirect_URL of application
+                example: http://apigee.com
       security:
       - BasicAuth: []
       responses:
