@@ -1,0 +1,2190 @@
+swagger: '2.0'
+
+# Metadata
+info:
+  title: Developer Registry API
+  version: 1.0.0
+  description: |
+    Below are the lists of common terms which are required by the Operators to integrate with the API Exchange program.
+
+    **Authentication (Common to all APIs)**
+
+    Developer Operators will be provided with a client-id and client-secret for accessing the Developer Registry APIs. Each API call requires HTTP basic authentication using these credentials. The APIs are exposed over HTTPS (SSL over HTTP) hence the credentials are not exposed to man in the middle attacks.
+
+    In basic authentication the user-agent of the client will send an encoded Authorization header. The Authorization header is constructed as follows
+
+    * The client-id and client-secret literals are combined into a string like this, 'client-id:client-secret'
+
+    * The resulting string literal is then encoded using Base64 encoding
+
+    * The authorization method and a space i.e. "Basic " is then put before the encoded string.
+
+    **Content-Type (Common to all APIs)**
+
+    The current version of APIs support only application/json.
+
+    * Content-Type header shall have application/json (applicable for all Create/Update APIs)
+
+    * Accept header if present, shall have application/json.
+
+    **Error Responses (Common to all APIs)**
+
+    *Error Response Format*
+
+    If there is a response payload, the format of the error response payload is like below.
+
+          {
+            "error":"error_name",
+            "description":"error_description"
+          }
+
+    *Here is list of examples for various error scenarios*
+
+    * Some input parameters are validated by the API layer before processing. If such validations are failed a **400 Bad response** would be returned.The exact error code and the error message for every api response payload will vary.
+
+    * When wrong or missing Authorization header is sent in the request, 401 HTTP code is returned without any payload in the response.
+
+    * Wrong HTTP method used that is not allowed by the resource. 405 HTTP code is returned without any payload in the response.
+
+    * Internal Server Error 500 - this error code is returned for all unhandled exception and errors. Unhandled exceptions include incorrect data in the request, attempt to recreate existing records or any unknown error in the server side execution.
+
+          {
+            "error":"Internal_Server_Error"
+            "description":"Could not complete requested service. If the problem persists, please contact support."
+          }
+
+    **Error Responses** (Common across APIs)
+
+    For Developer and Developer Compliances
+
+    | Scenario             | Status          | Error                    | Description                 |
+    |----------------------|----------------------|--------------------------|-----------------------------|
+    | Missing Authorization Header | 401 Unauthorised | Unauthorized_Access | Your request needs a valid session or valid credentials |
+    | Wrong tncId                  | 404 Not Found | Not_Found_Entity    | No Compliance/TnC details for the given TncID |
+
+    Broadly following the REST principles and HTTP conventions the following error codes are used by the Exchange
+
+    | **HTTP Error Code** | **Explanation** |
+    |---------------------|-----------------|
+    | 400 | Bad Request - The request validation is failed by the API. For handled validations this error code is returned |
+    | 401 | Unauthorized - Authorization header is missing or incorrect  |
+    | 403 | Forbidden - Access to the requested resource is not allowed  |
+    | 404 | Not Found - The specified resource could not be found        |
+    | 405 | Method Not Allowed - Specified HTTP method is not allowed on the requested resource |
+    | 500 | Internal Server Error - Server side error. Please try again later |
+    | 503 | Service Unavailable - One or more required server side services are not available. Please try again later |
+
+host: discover.mobileconnect.io
+basePath: /v1/exchange/organizations
+schemes:
+  - https
+
+# Tags
+tags:
+- name: Application
+  description: Applications APIs
+- name: AppCredential
+  description: App Credential APIs
+- name: Developer
+  description: Developer APIs
+- name: DeveloperClientName
+  description: Developer App Client Name APIs
+- name: DeveloperCompliance
+  description: Developer Compliance APIs
+
+# API Paths
+paths:
+  '/{orgId}/developers/{devId}/applications':
+    post:
+      tags:
+        - Application
+      summary: Create Application
+      description: |
+        **Pre-requisites**
+
+        * The Developer Operator Organization must be on-boarded on to Exchange.
+
+        * A valid Operator username and password should be issued.
+
+        * There is a valid Developer with the given devId.
+
+        * Valid products must be enabled for the Developer Operator organization. This is carried out at the time of provisioning the Developer Operator onto the Exchange. This information should also be available in the Operator Portal.
+
+        * The Client name should be valid.
+
+        **Error Scenario**
+
+          | Parameter         | Scenario | Status                    | Error Description                             |
+          |-------------------|----------|---------------------------|-----------------------------------------------|
+          | orgId             | Missing  | 404 Not Found             | Requested Resource Not Found                  |
+          |                   | Invalid  | 404 Not Found             | The Organization is not found in exchange now |
+          | devId             | Missing  | 404 Not Found             | Requested Resource Not Found                  |
+          |                   | Invalid  | 404 Not Found             | Developer Not Found                           |
+          | body.name         | Missing  | 400 Bad Request           | Invalid_Request - Invalid Application Name    |
+          | body.status       | Missing  | 400 Bad Request           | Invalid_Request - Invalid Status[undefined]   |
+          | body.product      | Missing  | 500 internal server error | null                                          |
+          | body.product.name | Missing  | 400 Bad Request           | Invalid_Request - Invalid Product             |
+      produces:
+        - application/json
+      parameters:
+        - in: path
+          name: orgId
+          description: String representing the Developer Operator Organization ID as created in the Exchange
+          required: true
+          type: string
+        - in: path
+          name: devId
+          description: Developer email is the primary key used as Developer ID
+          required: true
+          type: string
+        - name: Content-Type
+          in: header
+          description: Content-Types that are acceptable
+          type: string
+          default: application/json
+          enum:
+            - application/json
+        - in: body
+          name: body
+          required: true
+          description: Application credential details
+          schema:
+            $ref: '#/definitions/APPLICATION_Req'
+      responses:
+        200:
+          description: Success
+          schema:
+            $ref: '#/definitions/CREATE_APP_Resp'
+        400:
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/ERROR_400'
+        404:
+          description: Not Found
+          schema:
+            $ref: '#/definitions/ERROR_404'
+        500:
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/ERROR_500'
+      security:
+        - basicAuth: []
+
+    get:
+      tags:
+        - Application
+      summary: Get All Applications
+      description: |
+        **Error Scenario**
+
+        | Parameter | Scenario | Status        | Error Description                             |
+        |-----------|----------|---------------|-----------------------------------------------|
+        | orgID     | Missing  | 404 Not Found | Requested Resource Not Found                  |
+        |           | Invalid  | 404 Not Found | The Organization is not found in exchange now |
+        | devID     | Missing  | 404 Not Found | Requested Resource Not Found                  |
+        |           | Invalid  | 404 Not Found | Developer Not Found                           |
+      produces:
+        - application/json
+      parameters:
+        - in: path
+          name: orgId
+          description: Organization ID as created in the Exchange
+          required: true
+          type: string
+        - in: path
+          name: devId
+          description: Developer ID as created in the Exchange
+          required: true
+          type: string
+        - name: Content-Type
+          in: header
+          description: Content Type that are acceptable
+          type: string
+          default: application/json
+          enum:
+            - application/json
+      responses:
+        201:
+          description: Success
+          schema:
+            $ref: '#/definitions/GET_ALL_APP_Resp'
+        404:
+          description: Not Found
+          schema:
+            $ref: "#/definitions/ERROR_404"
+      security:
+        - basicAuth: []
+
+  '/{orgId}/developers/{devId}/applications/{appId}':
+    get:
+      tags:
+        - Application
+      summary: Get Application
+      description: >
+        **Pre-requisites**
+
+        * The Developer Operator Organization must be on-boarded on to Exchange
+
+        * A valid Operator username and password should be issued
+
+        * The specific Developer should exist in the system for the specific
+        Developer Operator
+
+        * The specific Application requested should be available in the system
+        for the specific Developer
+        
+
+        **Error Scenario**
+
+          | Parameter | Scenario | Status          | Error Description                                  |
+          |-----------|----------|-----------------|----------------------------------------------------|
+          | orgID     | Missing  | 404 Not Found   | Requested Resource Not Found                       |
+          |           | Invalid  | 404 Not Found   | The Organization is not found in exchange now      |
+          | devID     | Missing  | 404 Not Found   | Requested Resource Not Found                       |
+          |           | Invalid  | 404 Not Found   | Developer Not Found                                |
+          | appID     | Missing  | 404 Not Found   | Application Not Found                              |
+          |           | Invalid  | 404 Not Found   | Application Not Found                              |
+      produces:
+        - application/json
+      parameters:
+        - in: path
+          name: orgId
+          description: Organization ID as created in the Exchange
+          required: true
+          type: string
+        - in: path
+          name: devId
+          description: Developer ID as created in the Exchange
+          required: true
+          type: string
+        - in: path
+          name: appId
+          description: Application ID as created in the Exchange
+          required: true
+          type: string
+        - name: Content-Type
+          in: header
+          description: Content Type that are acceptable
+          type: string
+          default: application/json
+          enum:
+            - application/json
+      responses:
+        201:
+          description: Success
+          schema:
+            $ref: '#/definitions/CREATE_APP_Resp'
+        404:
+          description: Not Found
+          schema:
+            $ref: '#/definitions/ERROR_404'
+      security:
+        - basicAuth: []
+
+    put:
+      tags:
+        - Application
+      summary: Update Application
+      description: >
+        **Pre-requisites**
+
+        * The Developer Operator Organization must be on-boarded on to Exchange.
+
+        * A valid Operator username and password should be issued.
+
+        * There is a valid Developer with the given devId.
+
+        * Valid products must be enabled for the Developer Operator organization. This is carried out at the time of provisioning the Developer Operator onto the Exchange. This information should also be available in the Operator Portal.
+
+        * The Client name should be valid.
+        
+        
+
+        **Error Scenario**
+
+          | Parameter         | Scenario | Status                    | Error Description                             |
+          |-------------------|----------|---------------------------|-----------------------------------------------|
+          | orgId             | Missing  | 404 Not Found             | Requested Resource Not Found                  |
+          |                   | Invalid  | 404 Not Found             | The Organization is not found in exchange now |
+          | devId             | Missing  | 404 Not Found             | Requested Resource Not Found                  |
+          |                   | Invalid  | 404 Not Found             | Developer Not Found                           |
+          | appId             | Missing  | 404 Not Found             | Application Not Found                         |
+          |                   | Invalid  | 404 Not Found             | Application Not Found                         |
+          | body.name         | Missing  | 400 Bad Request           | Invalid_Request - Invalid Application Name    |
+          | body.status       | Missing  | 400 Bad Request           | Invalid_Request - Invalid Status[undefined]   |
+          | body.product      | Missing  | 500 internal server error | null                                          |
+          | body.product.name | Missing  | 400 Bad Request           | Invalid_Request - Invalid Product             |
+
+      produces:
+        - application/json
+      parameters:
+        - in: path
+          name: orgId
+          description: Organization ID as created in the Exchange
+          required: true
+          type: string
+        - in: path
+          name: devId
+          description: Developer ID as created in the Exchange
+          required: true
+          type: string
+        - in: path
+          name: appId
+          description: Application ID as created in the Exchange
+          required: true
+          type: string
+        - name: Content-Type
+          in: header
+          description: Content Type that are acceptable
+          type: string
+          default: application/json
+          enum:
+            - application/json
+      responses:
+        201:
+          description: Success
+          schema:
+            $ref: '#/definitions/CREATE_APP_Resp'
+        404:
+          description: Not Found
+          schema:
+            $ref: '#/definitions/ERROR_404'
+        400:
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/ERROR_400'
+      security:
+        - basicAuth: []
+
+  '/{orgId}/developers/{devId}/applications/{appId}/credentials':
+    post:
+      tags:
+        - AppCredential
+      summary: Create Application Credential
+      description: |
+        **Pre-requisites**
+
+        * The Developer Operator Organization must be on-boarded on to Exchange
+
+        * A valid Operator username and password should be issued
+
+        * A valid Developer and an associated application needs to be available to which credential needs to be added.
+
+        **Error Scenario**
+
+        | Parameter          | Scenario | Status          | Error Description                                  |
+        |--------------------|----------|-----------------|----------------------------------------------------|
+        | orgId              | Missing  | 404 Not Found   | Requested Resource Not Found                       |
+        |                    | Invalid  | 404 Not Found   | The Organization is not found in exchange now      |
+        | devId              | Missing  | 404 Not Found   | Requested Resource Not Found                       |
+        |                    | Invalid  | 404 Not Found   | Developer Not Found                                |
+        | appId              | Missing  | 404 Not Found   | Application Not Found                              |
+        |                    | Invalid  | 404 Not Found   | Application Not Found                              |
+        | body.client_id     | Missing  | 400 Bad Request | Invalid_Request - apikey/appSecret cannot be empty |
+        | body.client_secret | Missing  | 400 Bad Request | Invalid_Request - apikey/appSecret cannot be empty |
+        | body.status        | Missing  | 400 Bad Request | Invalid_Request - Invalid Status [undefined]       |
+        | body.type          | Missing  | 400 Bad Request | Invalid_Request - Invalid type [undefined]         |
+        | body.redirectUri   | Missing  | 400 Bad Request | Invalid_Request - Invalid redirectUri [undefined]  |
+      produces:
+        - application/json
+      parameters:
+        - in: path
+          name: orgId
+          description: Organization ID as created in the Exchange
+          required: true
+          type: string
+        - in: path
+          name: devId
+          description: Developer ID as created in the Exchange
+          required: true
+          type: string
+        - in: path
+          name: appId
+          description: Application ID as created in the Exchange
+          required: true
+          type: string
+        - name: Content-Type
+          in: header
+          description: Content Type that are acceptable
+          type: string
+          default: application/json
+          enum:
+            - application/json
+        - in: body
+          name: body
+          required: true
+          description: Application credential details
+          schema:
+            $ref: '#/definitions/APP_CREDENTIALS_Req'
+      responses:
+        201:
+          description: Success
+          schema:
+            $ref: '#/definitions/APP_CREDENTIALS_Resp'
+        400:
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/ERROR_400'
+        404:
+          description: Not Found
+          schema:
+            $ref: '#/definitions/ERROR_404'
+      security:
+        - basicAuth: []
+
+    get:
+      tags:
+        - AppCredential
+      summary: Get All Application Credential
+      description: |
+        **Pre-requisites**
+
+        * The Developer Operator Organization must be on-boarded on to Exchange
+
+        * A valid Operator username and password should be issued
+
+        * The specific Developer should exist in the system for the specific
+        Developer Operator
+
+        * One or more credentials should be available in the system for the specific application
+
+        * An applications should available in the system for the specific Developer.
+
+        **Error Scenario**
+
+        | Parameter | Scenario | Status        | Error Description                             |
+        |-----------|----------|---------------|-----------------------------------------------|
+        | orgID     | Missing  | 404 Not Found | Requested Resource Not Found                  |
+        |           | Invalid  | 404 Not Found | The Organization is not found in exchange now |
+        | devID     | Missing  | 404 Not Found | Requested Resource Not Found                  |
+        |           | Invalid  | 404 Not Found | Developer Not Found                           |
+        | appID     | Missing  | 404 Not Found | Application Not Found                         |
+        |           | Invalid  | 404 Not Found | Application Not Found                         |
+      produces:
+        - application/json
+      parameters:
+        - in: path
+          name: orgId
+          description: Organization ID as created in the Exchange
+          required: true
+          type: string
+        - in: path
+          name: devId
+          description: Developer ID as created in the Exchange
+          required: true
+          type: string
+        - in: path
+          name: appId
+          description: Application ID as created in the Exchange
+          required: true
+          type: string
+        - name: Content-Type
+          in: header
+          description: Content Type that are acceptable
+          type: string
+          default: application/json
+          enum:
+            - application/json
+      responses:
+        201:
+          description: Success
+          schema:
+            $ref: '#/definitions/APP_CREDENTIALS_ALL_Resp'
+        404:
+          description: Not Found
+          schema:
+            $ref: "#/definitions/ERROR_404"
+      security:
+        - basicAuth: []
+
+  '/{orgId}/developers/{devId}/applications/{appId}/credentials/{apiKey}':
+    get:
+      tags:
+        - AppCredential
+      summary: Get Application Credential
+      description: >
+        **Pre-requisites**
+
+        * The Developer Operator Organization must be on-boarded on to Exchange
+
+        * A valid Operator username and password should be issued
+
+        * The specific Developer should exist in the system for the specific
+        Developer Operator
+
+        * The specific Application requested should be available in the system
+        for the specific Developer
+
+
+        **Error Scenario**
+
+          | Parameter | Scenario | Status          | Error Description                                  |
+          |-----------|----------|-----------------|----------------------------------------------------|
+          | orgId     | Missing  | 404 Not Found   | Requested Resource Not Found                       |
+          |           | Invalid  | 404 Not Found   | The Organization is not found in exchange now      |
+          | devId     | Missing  | 404 Not Found   | Requested Resource Not Found                       |
+          |           | Invalid  | 404 Not Found   | Developer Not Found                                |
+          | appId     | Missing  | 404 Not Found   | Application Not Found                              |
+          |           | Invalid  | 404 Not Found   | Application Not Found                              |
+          | apiKey    | Invalid  | 404 Not Found   | Not_Found_Entity- Application Credential Not Found |
+      produces:
+        - application/json
+      parameters:
+        - in: path
+          name: orgId
+          description: Organization ID as created in the Exchange
+          required: true
+          type: string
+        - in: path
+          name: devId
+          description: Developer ID as created in the Exchange
+          required: true
+          type: string
+        - in: path
+          name: appId
+          description: Application ID as created in the Exchange
+          required: true
+          type: string
+        - name: Content-Type
+          in: header
+          description: Content Type that are acceptable
+          type: string
+          default: application/json
+          enum:
+            - application/json
+        - in: path
+          name: apiKey
+          required: true
+          type: string
+          description: Application credential details
+      responses:
+        201:
+          description: Success
+          schema:
+            $ref: '#/definitions/APP_CREDENTIALS_Resp'
+        404:
+          description: Not Found
+          schema:
+            $ref: '#/definitions/ERROR_404'
+      security:
+        - basicAuth: []
+
+    put:
+      tags:
+        - AppCredential
+      summary: Update Application Credential
+      description: >
+        **Pre-requisites**
+
+        * The Developer Operator Organization must be on-boarded on to Exchange
+
+        * A valid Operator username and password should be issued
+
+        * A valid Developer and an associated application needs to be available to which credential needs to be added
+
+
+        **Error Scenario**
+
+          | Parameter          | Scenario | Status          | Error Description                                  |
+          |--------------------|----------|-----------------|----------------------------------------------------|
+          | orgId              | Missing  | 404 Not Found   | Requested Resource Not Found                       |
+          |                    | Invalid  | 404 Not Found   | The Organization is not found in exchange now      |
+          | devId              | Missing  | 404 Not Found   | Requested Resource Not Found                       |
+          |                    | Invalid  | 404 Not Found   | Developer Not Found                                |
+          | appId              | Missing  | 404 Not Found   | Application Not Found                              |
+          |                    | Invalid  | 404 Not Found   | Application Not Found                              |
+          | apiKey    | Invalid  | 404 Not Found   | Not_Found_Entity- Application Credential Not Found          |
+          | body.client_id     | Missing  | 400 Bad Request | Invalid_Request - apikey/appSecret cannot be empty |
+          | body.client_secret | Missing  | 400 Bad Request | Invalid_Request - apikey/appSecret cannot be empty |
+          | body.status        | Missing  | 400 Bad Request | Invalid_Request - Invalid Status[undefined]        |
+          | body.type          | Missing  | 400 Bad Request | Invalid_Request - Invalid type[undefined]          |
+          | body.redirectUri   | Missing  | 400 Bad Request | Invalid_Request - Invalid redirectUri[undefined]   |
+      produces:
+        - application/json
+      parameters:
+        - in: path
+          name: orgId
+          description: Organization ID as created in the Exchange
+          required: true
+          type: string
+        - in: path
+          name: devId
+          description: Developer ID as created in the Exchange
+          required: true
+          type: string
+        - in: path
+          name: appId
+          description: Application ID as created in the Exchange
+          required: true
+          type: string
+        - name: Content-Type
+          in: header
+          description: Content Type that are acceptable
+          type: string
+          default: application/json
+          enum:
+            - application/json
+        - in: path
+          name: apiKey
+          required: true
+          type: string
+          description: Application credential details
+      responses:
+        201:
+          description: Success
+          schema:
+            $ref: '#/definitions/APP_CREDENTIALS_Resp'
+        400:
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/ERROR_400'
+        404:
+          description: Not Found
+          schema:
+            $ref: '#/definitions/ERROR_404'
+      security:
+        - basicAuth: []
+
+  '/{orgId}/developers':
+    get:
+      tags:
+        - Developer
+      operationId: GET_ALL_DEVELOPERS
+      summary: Get All Developers
+      description: |
+        **Pre-requisites**
+
+        * The Developer Operator Organization must be on-boarded on to Exchange
+
+        * A valid Operator client-id and client-secret should be issued
+
+        * A list of Developers for that Operator should be available in the system. If not, then a JSON response with zero Developer records is returned.
+      produces:
+        - application/json
+      parameters:
+        - name: orgId
+          in: path
+          description: Organization ID as created in the Exchange
+          required: true
+          type: string
+        - name: limit
+          in: query
+          description: The number of records to return in a page; default is 10
+          type: integer
+        - name: pageHint
+          in: query
+          description: To receive the next page of records, if nextPageHint was received in the previous invocation
+          type: string
+        - name: Accept
+          in: header
+          description: Accepted format for response
+          type: string
+          enum:
+          - application/json
+      security:
+        - basicAuth: []
+      responses:
+        200:
+          description: Success
+          schema:
+            $ref: '#/definitions/DEVELOPERS_Resp'
+        401:
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/ERROR_401'
+        404:
+          description: Not Found
+          schema:
+            $ref: '#/definitions/ERROR_404_TNC'
+
+    post:
+      tags:
+        - Developer
+      operationId: CREATE_DEVELOPER
+      summary: Create a Developer
+      description: |
+        **Pre-requisites**
+
+        * The Developer Operator Organization must be on-boarded on to Exchange
+
+        * A valid Operator username and password should be issued
+      produces:
+        - application/json
+      parameters:
+        - name: orgId
+          in: path
+          description: Organization ID as created in the Exchange
+          required: true
+          type: string
+        - name: Accept
+          in: header
+          description: Accepted format for response
+          type: string
+          enum:
+          - application/json
+        - name: Content-Type
+          in: header
+          description: Request format
+          type: string
+          enum:
+          - application/json
+        - name: body
+          in: body
+          description: Request Body
+          required: true
+          schema:
+            type: object
+            properties:
+              email:
+                type: string
+                description: Developer Email
+                example: avinash@digitalapicraft.com
+              fullName:
+                type: string
+                description: Developer Full Name
+                example: ABC PQR
+              companyName:
+                type: string
+                description: Developer Company Name
+                example: Digital Api Craft
+              correlationId:
+                type: string
+                description: The developer identifier used in Operators' system (in the system of records for Developer)
+                example: manual_20170427
+              status:
+                type: string
+                description: Status of Developer,An enum of the following values APPROVED, UNAPPROVED, REJECTED, REVOKED
+                example: APPROVED
+              type:
+                type: string
+                description: An enum of the following values TRUSTED, UNTRUSTED. Depending on the Developer Operator configuration of AutoApproveTrusted/Untrusted flag values; the applications created of the developer will have the default status.
+                example: TRUSTED
+              country:
+                type: string
+                description: Country Code
+                example : IN
+      security:
+        - basicAuth: []
+      responses:
+        200:
+          description: Success
+          schema:
+            $ref: '#/definitions/DEVELOPER'
+        400:
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/ERROR_404_TNC'
+        401:
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/ERROR_401'
+        404:
+          description: Not Found
+          schema:
+            $ref: '#/definitions/ERROR_404_TNC'
+
+  '/{orgId}/developers/{devId}':
+    get:
+      tags:
+        - Developer
+      operationId: GET_DEVELOPER
+      summary: Get a Developer
+      description: |
+        **Pre-requisites**
+
+        * The Developer Operator Organization must be on-boarded on to Exchange
+
+        * A valid Operator client-id and client-secret should be issued
+
+        * The requested Developer with the specific resource id should exist in the system
+      produces:
+        - application/json
+      parameters:
+        - name: orgId
+          in: path
+          description: Organization ID as created in the Exchange
+          required: true
+          type: string
+        - name: devId
+          in: path
+          description: Developer ID as created in the Exchange
+          required: true
+          type: string
+        - name: Accept
+          in: header
+          description: Accepted format for response
+          type: string
+          enum:
+          - application/json
+      security:
+        - basicAuth: []
+      responses:
+        200:
+          description: Success
+          schema:
+            $ref: '#/definitions/DEVELOPER'
+        401:
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/ERROR_401'
+        404:
+          description: Not Found
+          schema:
+            $ref: '#/definitions/ERROR_404_TNC'
+
+    put:
+      tags:
+        - Developer
+      operationId: UPDATE_DEVELOPER
+      summary: Update a Developer
+      description: |
+        **Pre-requisites**
+
+        * The Developer Operator Organization must be on-boarded on to Exchange
+
+        * A valid Operator username and password should be issued
+
+        * The Developer resource with the id must be available
+      produces:
+        - application/json
+      parameters:
+        - name: orgId
+          in: path
+          description: Organization ID as created in the Exchange
+          required: true
+          type: string
+        - name: devId
+          in: path
+          description: Developer ID as created in the Exchange
+          required: true
+          type: string
+        - name: Accept
+          in: header
+          description: Content-Types that are acceptable for the response
+          type: string
+          enum:
+          - application/json
+        - name: Content-Type
+          in: header
+          description: Content-Types that are acceptable for the request
+          type: string
+          enum:
+          - application/json
+        - name: body
+          in: body
+          description: Request Body
+          required: true
+          schema:
+            type: object
+            properties:
+              email:
+                type: string
+                description: Developer Email
+                example: avinash@digitalapicraft.com
+              fullName:
+                type: string
+                description: Developer Full Name
+                example: ABC PQR
+              companyName:
+                type: string
+                description: Developer Company Name
+                example : Digital Api Craft
+              correlationId:
+                type: string
+                description: The developer identifier used in Operators' system (in the system of records for Developer)
+                example: manual_20170427
+              status:
+                type: string
+                description: Status of Developer,An enum of the following values APPROVED, UNAPPROVED, REJECTED, REVOKED
+                example: APPROVED
+              type:
+                type: string
+                description: An enum of the following values TRUSTED, UNTRUSTED. Depending on the Developer Operator configuration of AutoApproveTrusted/Untrusted flag values; the applications created of the developer will have the default status.
+                example : TRUSTED
+              trustedMode:
+                type: integer
+                description: A unit interval float value which signifies the level of trust in the developer
+                example : 999
+              country:
+                type: string
+                description: A two character code representing country of the developer
+                example: IN
+      security:
+        - basicAuth: []
+      responses:
+        200:
+          description: Success
+          schema:
+            $ref: '#/definitions/DEVELOPER'
+        400:
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/ERROR_404_TNC'
+        401:
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/ERROR_401'
+        404:
+          description: Not Found
+          schema:
+            $ref: '#/definitions/ERROR_404_TNC'
+
+  '/{orgId}/developers/{devId}/clientnames':
+    post:
+      tags:
+        - DeveloperClientName
+      summary: Create an DeveloperClientName for a Developer
+      description: |
+        **Pre-requisites**
+
+        * The Developer Operator Organization must be on-boarded on to Exchange.
+
+        * A valid Operator username and password should be issued.
+
+        * There is a valid Developer with the given Developer ID.
+
+        **Error Scenario**
+
+          | Parameter         | Scenario | Status                    | Error Description                             |
+          |-------------------|----------|---------------------------|-----------------------------------------------|
+          | orgID             | Missing  | 404 Not Found             | Requested Resource Not Found                  |
+          |                   | Invalid  | 404 Not Found             | The Organization is not found in exchange now |
+          | devID             | Missing  | 404 Not Found             | Requested Resource Not Found                  |
+          |                   | Invalid  | 404 Not Found             | Developer Not Found                           |
+      produces:
+        - application/json
+      parameters:
+        - in: path
+          name: orgId
+          description: >-
+            It is a string representing the Developer Operator Organization ID
+            as created in the Exchange
+          required: true
+          type: string
+        - in: path
+          name: devId
+          description: Developer email is the primary key used as Developer ID
+          required: true
+          type: string
+        - name: Content-Type
+          in: header
+          description: Content Type that are acceptable for request
+          type: string
+          default: application/json
+          enum:
+            - application/json
+        - in: body
+          name: body
+          required: true
+          description: Application credential details
+          schema:
+            $ref: '#/definitions/APP_SHORTNAME_Req'
+      responses:
+        200:
+          description: Success
+          schema:
+            $ref: '#/definitions/CLIENT_Resp'
+        400:
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/ERROR_400'
+        404:
+          description: Not Found
+          schema:
+            $ref: '#/definitions/ERROR_404'
+        500:
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/ERROR_500'
+      security:
+        - basicAuth: []
+
+    get:
+      tags:
+        - DeveloperClientName
+      summary: Get DeveloperClientName for specific developer
+      description: >
+        **Error Scenario**
+        
+        
+        Below will be the error for invalid request.
+
+          | Parameter | Scenario | Status        | Error Description |
+          |-----------|----------|---------------|-----------------------------------------------|
+          | orgId     | Missing  | 404 Not Found | Requested Resource Not Found                  |
+          |           | Invalid  | 404 Not Found | The Organization is not found in exchange now |
+          | devId     | Missing  | 404 Not Found | Requested Resource Not Found                  |
+          |           | Invalid  | 404 Not Found | Developer Not Found                           |
+      produces:
+        - application/json
+      parameters:
+        - in: path
+          name: orgId
+          description: Organization ID as created in the Exchange
+          required: true
+          type: string
+        - in: path
+          name: devId
+          description: Developer ID as created in the Exchange
+          required: true
+          type: string
+        - name: Content-Type
+          in: header
+          description: Content Type for request
+          type: string
+          default: application/json
+          enum:
+            - application/json
+      responses:
+        201:
+          description: Success
+          schema:
+            $ref: '#/definitions/CLIENT_NAME_Resp'
+        404:
+          description: Not Found
+          schema:
+            $ref: '#/definitions/ERROR_404'
+      security:
+        - basicAuth: []
+
+  '/{orgId}/developers/{devId}/clientnames/{client_name}':
+    get:
+      tags:
+        - DeveloperClientName
+      summary: Get DeveloperClientName details
+      description: >
+        **Pre-requisites**
+
+        * The Developer Operator Organization must be on-boarded on to Exchange
+
+        * A valid Operator username and password should be issued
+
+        * The Developer for which the Application is to be created should be in
+        ACTIVE state
+
+        * The Client name should be valid
+
+
+        **Error Scenario**
+
+          | Parameter         | Scenario | Status                    | Error Description                             |
+          |-------------------|----------|---------------------------|-----------------------------------------------|
+          | orgId             | Missing  | 404 Not Found             | Requested Resource Not Found                  |
+          |                   | Invalid  | 404 Not Found             | The Organization is not found in exchange now |
+          | devId             | Missing  | 404 Not Found             | Requested Resource Not Found                  |
+          |                   | Invalid  | 404 Not Found             | Developer Not Found                           |
+          | DeveloperClientName        | Missing  | 404 Not Found             | Client Not Found                              |
+          |                   | Invalid  | 404 Not Found             | Client Not Found                              |
+      produces:
+        - application/json
+      parameters:
+        - in: path
+          name: orgId
+          description: Organization ID as created in the Exchange
+          required: true
+          type: string
+        - in: path
+          name: devId
+          description: Developer ID as created in the Exchange
+          required: true
+          type: string
+        - in: path
+          name: client_name
+          description: Application ID as created in the Exchange
+          required: true
+          type: string
+        - name: Content-Type
+          in: header
+          description: Content Type for request
+          type: string
+          default: application/json
+          enum:
+            - application/json
+      responses:
+        201:
+          description: Success
+          schema:
+            $ref: '#/definitions/CLIENT_DETAILS_Resp'
+        404:
+          description: Not Found
+          schema:
+            $ref: '#/definitions/ERROR_404'
+      security:
+        - basicAuth: []
+
+    put:
+      tags:
+        - DeveloperClientName
+      summary: Update DeveloperClientName
+      description: |
+        **Pre-requisites**
+        * The Developer Operator Organization must be on-boarded on to Exchange.
+        * A valid Operator username and password should be issued.
+        * There is a valid Developer with the given Developer ID.
+        * The Client name should be valid.
+
+        **Error Scenario**
+
+          | Parameter         | Scenario | Status                    | Error Description                             |
+          |-------------------|----------|---------------------------|-----------------------------------------------|
+          | orgID             | Missing  | 404 Not Found             | Requested Resource Not Found                  |
+          |                   | Invalid  | 404 Not Found             | The Organization is not found in exchange now |
+          | devID             | Missing  | 404 Not Found             | Requested Resource Not Found                  |
+          |                   | Invalid  | 404 Not Found             | Developer Not Found                           |
+          | DeveloperClientName        | Missing  | 404 Not Found             | Client Not Found                              |
+          |                   | Invalid  | 404 Not Found             | Client Not Found                              |
+      produces:
+        - application/json
+      parameters:
+        - in: path
+          name: orgId
+          description: Organization ID as created in the Exchange
+          required: true
+          type: string
+        - in: path
+          name: devId
+          description: Developer ID as created in the Exchange
+          required: true
+          type: string
+        - in: path
+          name: client_name
+          description: client_name as in the exchange
+          required: true
+          type: string
+        - name: Content-Type
+          in: header
+          description: Content Type that are acceptable for request
+          type: string
+          default: application/json
+          enum:
+            - application/json
+      responses:
+        201:
+          description: Success
+          schema:
+            $ref: '#/definitions/CLIENT_Resp'
+        400:
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/ERROR_400'
+        404:
+          description: Not Found
+          schema:
+            $ref: '#/definitions/ERROR_404'
+      security:
+        - basicAuth: []
+
+    delete:
+      tags:
+        - DeveloperClientName
+      summary: Delete DeveloperClientName details
+      description: >
+        **Pre-requisites**
+
+        * The Developer Operator Organization must be on-boarded on to Exchange
+
+        * A valid Operator username and password should be issued
+
+        * The Developer for which the Application is to be created should be in
+        ACTIVE state
+
+        * The Client name should be valid
+
+
+        **Error Scenario**
+
+          | Parameter         | Scenario | Status                    | Error Description                             |
+          |-------------------|----------|---------------------------|-----------------------------------------------|
+          | orgId             | Missing  | 404 Not Found             | Requested Resource Not Found                  |
+          |                   | Invalid  | 404 Not Found             | The Organization is not found in exchange now |
+          | devId             | Missing  | 404 Not Found             | Requested Resource Not Found                  |
+          |                   | Invalid  | 404 Not Found             | Developer Not Found                           |
+          | DeveloperClientName        | Missing  | 404 Not Found             | Client Not Found                              |
+          |                   | Invalid  | 404 Not Found             | Client Not Found                              |
+      produces:
+        - application/json
+      parameters:
+        - in: path
+          name: orgId
+          description: Organization ID as created in the Exchange
+          required: true
+          type: string
+        - in: path
+          name: devId
+          description: Developer ID as created in the Exchange
+          required: true
+          type: string
+        - in: path
+          name: client_name
+          description: Application ID as created in the Exchange
+          required: true
+          type: string
+        - name: Content-Type
+          in: header
+          description: Content Type that ae acceptable for request
+          type: string
+          default: application/json
+          enum:
+            - application/json
+      responses:
+        201:
+          description: Success
+          schema:
+            $ref: '#/definitions/CLIENT_Resp'
+        404:
+          description: Not Found
+          schema:
+            $ref: '#/definitions/ERROR_404'
+      security:
+        - basicAuth: []
+
+  '/{orgId}/clientnames':
+    get:
+      tags:
+        - DeveloperClientName
+      summary: Get All DeveloperClientNames for developer
+      description: >
+        **Error Scenario**
+        
+  
+          | Parameter | Scenario | Status        | Error Description                            |
+          |-----------|----------|---------------|-----------------------------------------------|
+          | orgId     | Missing  | 404 Not Found | Requested Resource Not Found                  |
+          |           | Invalid  | 404 Not Found | The Organization is not found in exchange now |
+      produces:
+        - application/json
+      parameters:
+        - in: path
+          name: orgId
+          description: Organization ID as created in the Exchange
+          required: true
+          type: string
+        - in: query
+          name: contains_name
+          description: It is a string which will help filter the clientnames
+          required: true
+          type: string
+        - name: Content-Type
+          in: header
+          description: Content Type that are acceptable for request
+          type: string
+          default: application/json
+          enum:
+            - application/json
+      responses:
+        201:
+          description: Success
+          schema:
+            type: array
+            description: All the client names as a result of wildcard match..
+            items:
+              type: string
+      security:
+        - basicAuth: []
+
+  '/{orgId}/developers/{devEmail}/tncs':
+    get:
+      operationId: GET_ALL_COMPLIANCES
+      summary: Get All Compliances
+      description: Get All Compliances
+      tags:
+        - DeveloperCompliance
+      produces:
+        - application/json
+      parameters:
+        - name: orgId
+          in: path
+          description: Organization ID as created in the Exchange
+          required: true
+          type: string
+        - name: devEmail
+          in: path
+          description: Developer email as created in the Exchange
+          required: true
+          type: string
+        - name: tncStatus
+          in: query
+          description: Status of Compliance
+          type: string
+          enum:
+          - accepted
+          - unaccepted
+        - name: Accept
+          in: header
+          description: Content-Types that are acceptable for the response.
+          type: string
+          enum:
+          - application/json
+      security:
+        - basicAuth: []
+      responses:
+        200:
+          description: Success
+          schema:
+            $ref: '#/definitions/COMPLIANCES_Resp'
+        401:
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/ERROR_401'
+        404:
+          description: Not Found
+          schema:
+            $ref: '#/definitions/ERROR_404_TNC'
+
+    post:
+      operationId: ACCEPT_ALL_COMPLIANCE
+      summary: Accept All Developer Compliances
+      description: |
+        **Pre-requisites**
+
+        * The Developer Operator Organization must be on-boarded on to Exchange
+
+        * A valid Operator client-id and client-secret should be issued
+
+        * One or more Serving Operators should have published valid Developer T&Cs on the Exchange
+
+        * A Developer with APPROVED status should have been created in the system for the Developer Operator
+      tags:
+        - DeveloperCompliance
+      produces:
+        - application/json
+      parameters:
+        - name: orgId
+          in: path
+          description: Organization ID as created in the Exchange
+          required: true
+          type: string
+        - name: devEmail
+          in: path
+          description: Developer email as created in the Exchange
+          required: true
+          type: string
+        - name: Accept
+          in: header
+          description: Content-Types that are acceptable for the response.
+          type: string
+          enum:
+          - application/json
+        - name: Content-Type
+          in: header
+          description: Content-Types that are acceptable for the request.
+          required: true
+          type: string
+          enum:
+          - application/json
+        - name: body
+          in: body
+          description: Request Body
+          required: true
+          schema:
+            type: object
+            properties:
+              tncs:
+                type: string
+                
+                enum:
+                - all
+      security:
+        - basicAuth: []
+      responses:
+        200:
+          description: Success
+          schema:
+            $ref: '#/definitions/COMPLIANCES_Resp'
+        401:
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/ERROR_401'
+        404:
+          description: Not Found
+          schema:
+            $ref: '#/definitions/ERROR_404_TNC'
+
+  '/{orgId}/tncs/other-operators':
+    get:
+      operationId: GET_ALL_COMPLIANCES_OTHERS
+      summary: Get All Compliances Other Operators
+      description: |
+        **Pre-requisites**
+
+        * The Developer Operator Organization must be on-boarded on to Exchange
+        * The Developer Operator Organization must be on-boarded on to Exchange
+
+        * A valid Operator username and password should be issue
+
+        * The Developer Operator must have accepted terms to inter-operate with a number of Serving Operator Organizations
+
+        * One or more Serving Operators should have published valid Developer T&Cs on the Exchange. If not, then a JSON response with zero T&C records is returned.
+      tags:
+        - DeveloperCompliance
+      produces:
+        - application/json
+      parameters:
+        - name: orgId
+          in: path
+          description: Organization ID as created in the Exchange
+          required: true
+          type: string
+        - name: Accept
+          in: header
+          description: Content-Types that are acceptable for the response.
+          type: string
+          enum:
+          - application/json
+      security:
+        - basicAuth: []
+      responses:
+        200:
+          description: Success
+          schema:
+            $ref: '#/definitions/COMPLIANCES_OTHERS_Resp'
+        401:
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/ERROR_401'
+
+  '/{orgId}/developers/{devEmail}/tncs/{tncId}':
+    get:
+      operationId: GET_COMPLIANCE
+      summary: Get Developer Compliance
+      description: Get Developer Compliance
+      tags:
+        - DeveloperCompliance
+      produces:
+        - application/json
+      parameters:
+        - name: orgId
+          in: path
+          description: Organization ID as created in the Exchange
+          required: true
+          type: string
+        - name: devEmail
+          in: path
+          description: Developer email as created in the Exchange
+          required: true
+          type: string
+        - name: tncId
+          in: path
+          description: Compliance ID to be accepted
+          required: true
+          type: string
+        - name: Accept
+          in: header
+          description: Content-Types that are acceptable for the response.
+          type: string
+          enum:
+          - application/json
+      security:
+        - basicAuth: []
+      responses:
+        200:
+          description: Success
+          schema:
+            $ref: '#/definitions/TNC'
+        401:
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/ERROR_401'
+        404:
+          description: Not Found
+          schema:
+            $ref: '#/definitions/ERROR_404_TNC'
+
+    post:
+      operationId: ACCEPT_COMPLIANCE
+      summary: Accept Developer Compliance
+      description: |
+        **Pre-requisites**
+
+        * The Developer Operator Organization must be on-boarded on to Exchange
+
+        * A valid Operator client-id and client-secret should be issued
+
+        * The Developer Operator must have accepted terms to inter-operate with a number of Serving Operator Organizations
+
+        * One or more Serving Operators should have published valid Developer T&Cs on the Exchange
+
+        * A Developer with APPROVED status should have been created in the system for the Developer Operator
+      tags:
+        - DeveloperCompliance
+      produces:
+        - application/json
+      parameters:
+        - name: orgId
+          in: path
+          description: Organization ID as created in the Exchange
+          required: true
+          type: string
+        - name: devEmail
+          in: path
+          description: Developer email as created in the Exchange
+          required: true
+          type: string
+        - name: tncId
+          in: path
+          description: Compliance ID to be accepted
+          required: true
+          type: string
+        - name: Accept
+          in: header
+          description: Content-Types that are acceptable for the response.
+          type: string
+          enum:
+          - application/json
+        - name: Content-Type
+          in: header
+          description: Content-Types that are acceptable for the request.
+          required: true
+          type: string
+          enum:
+          - application/json
+        - name: body
+          in: body
+          description: Request Body
+          required: true
+          schema:
+            type: object
+            properties:
+              tncStatus:
+                type: string
+                enum:
+                - ACCEPTED
+                - UNACCEPTED
+      security:
+        - basicAuth: []
+      responses:
+        200:
+          description: Success
+          schema:
+            $ref: '#/definitions/COMPLIANCES_Resp'
+        401:
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/ERROR_401'
+        404:
+          description: Not Found
+          schema:
+            $ref: '#/definitions/ERROR_404_TNC'
+
+    put:
+      operationId: UPDATE_COMPLIANCE
+      summary: Update Developer Compliance
+      description: |
+        **Pre-requisites**
+
+        * The Developer Operator Organization must be on-boarded on to Exchange
+
+        * A valid Operator username and password should be issued
+
+        * The Developer & the TnC entities exist
+      tags:
+        - DeveloperCompliance
+      produces:
+        - application/json
+      parameters:
+        - name: orgId
+          in: path
+          description: Organization ID as created in the Exchange
+          required: true
+          type: string
+        - name: devEmail
+          in: path
+          description: Developer email as created in the Exchange
+          required: true
+          type: string
+        - name: tncId
+          in: path
+          description: Compliance ID to be accepted
+          required: true
+          type: string
+        - name: Accept
+          in: header
+          description: Content-Types that are acceptable for the response.
+          type: string
+          enum:
+          - application/json
+        - name: Content-Type
+          in: header
+          description: Content-Types that are acceptable for the request.
+          required: true
+          type: string
+          enum:
+          - application/json
+        - name: body
+          in: body
+          description: Request Body
+          required: true
+          schema:
+            type: object
+            properties:
+              tncStatus:
+                type: string
+                description: Whether the developer has ACCEPTED/UNACCEPTED the TnC
+                example: ACCEPTED
+                enum:
+                - ACCEPTED
+                - UNACCEPTED
+              tncUrl:
+                type: string
+                description: The TnC url from where to get the details of the TnC
+                example: http://tnc.subop.com/tnc.pdf
+              tncText:
+                type: string
+                description: A brief text describing the TnC
+                example: Updated Description
+      security:
+        - basicAuth: []
+      responses:
+        200:
+          description: Success
+          schema:
+            $ref: '#/definitions/TNC_UPDATE'
+        401:
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/ERROR_401'
+        404:
+          description: Not Found
+          schema:
+            $ref: '#/definitions/ERROR_404_TNC'
+
+# Security Definitions
+securityDefinitions:
+  basicAuth:
+    type: basic
+
+# Model Definitions
+definitions:
+  DEVELOPERS_Resp:
+    type: object
+    properties:
+      developer:
+        type: array
+        description: Array of Developer details
+        items:
+          $ref: "#/definitions/DEVELOPER"
+      totalRecords:
+        type: integer
+        description: Total number of Developer records returned in the response.
+        example: 10
+      nextPageHint:
+        type: string
+        description: If more records are available, the value to be in pageHint parameter to receive those.
+
+  COMPLIANCES_Resp:
+    type: object
+    properties:
+      tncs:
+        type: array
+        description: Array of Operator API Links
+        items:
+          $ref: "#/definitions/TNC"
+
+  DEVELOPER:
+    type: object
+    properties:
+      id:
+        type: string
+        description: A system generated identifier that uniquely represents the Developer entity
+        example: fb3******
+      email:
+        type: string
+        description: Developer’s email id. This field shall be unique for a developer operator.
+        example: avinash@digitalapicraft.com
+      orgId:
+        type: string
+        description: Operator identifier
+        example: GSMA-TEST
+      fullName:
+        type: string
+        description: Developer Full Name
+        example: ABC PQR
+      companyName:
+        type: string
+        description: Developer company name
+        example: Digital Api Craft
+      correlationId:
+        type: string
+        description: The developer identifier used in Operators' system (in the system of records for Developer)
+        example: manual_20170427
+      status:
+        type: string
+        description: Status of Developer,An enum of the following values APPROVED, UNAPPROVED, REJECTED, REVOKED
+        example : APPROVED
+      type:
+        type: string
+        description: An enum of the following values TRUSTED, UNTRUSTED. Depending on the Developer Operator configuration of AutoApproveTrusted/Untrusted flag values; the applications created of the developer will have the default status.
+        example : TRUSTED
+      trustedMode:
+        type: integer
+        description: A unit interval float value which signifies the level of trust in the developer
+        example: 999
+      country:
+        type: string
+        description: A two character code representing country of the developer
+        example: IN
+
+  TNC:
+    type: object
+    properties:
+      serOrgId:
+        type: string
+        description: Serving Operator identifier
+        example: sb2
+      expiryDate:
+        type: string
+        description: Expiry date of the TnC
+        example: 12/15/2017
+      tncId:
+        type: string
+        description: It is a string representing the Serving Operator's T&C ID as created in the Exchange.
+        example: 2a8633c4-******
+      tncStatus:
+        type: string
+        description: Whether the developer has ACCEPTED/UNACCEPTED the TnC
+        example: ACCEPTED
+      tncUrl:
+        type: string
+        description: The TnC url from where to get the details of the TnC
+        example: http://tnc.subop.com/tnc.pdf 
+      tncText:
+        type: string
+        description: A brief text describing the TnC
+        example: Updated Description
+      tncName:
+        type: string
+        description: TNC Compliance Name
+        example: sb1
+      version:
+        type: integer
+        description: Compliance Version
+        example: 1
+
+  TNC_UPDATE:
+    type: object
+    properties:
+      devOrgId:
+        type: string
+        description: Developer Operator identifier
+        example: fd8c1d0a-******
+      tncId:
+        type: string
+        description: Terms and Conditions identifier
+        example: 2a8633c4-******
+      tncStatus:
+        type: string
+        description: Whether the developer has ACCEPTED/UNACCEPTED the TnC
+        example: ACCEPTED
+
+  COMPLIANCES_OTHERS_Resp:
+    type: object
+    properties:
+      tnc:
+        type: array
+        description: Array of TNC
+        items:
+          $ref: "#/definitions/TNC_OTHERS"
+      totalRecords:
+        type: integer
+        description: Count of Records returned
+        example: 10
+
+  TNC_OTHERS:
+    type: object
+    properties:
+      id:
+        type: string
+        description: TNC Compliance ID
+        example: 21211d1a-******
+      serOrgId:
+        type: string
+        description: Serving Organization ID
+        example: sb2
+      startDate:
+        type: string
+        description: The start date of the developer compliance with the TnC
+        example: 12/15/2017
+      expiryDate:
+        type: string
+        description: Expiry Date
+        example: 12/02/2018
+      version:
+        type: integer
+        description: Compliance Version
+        example: 2
+      tncUrl:
+        type: string
+        description: The TnC url from where to get the details of the TnC
+        example: http://tnc.subop.com/tnc.pdf
+      tncText:
+        type: string
+        description: A brief text describing the TnC
+        example: Updated Description
+      tncDisplayName:
+        type: string
+        description: TNC Compliance Name
+
+  APP_CREDENTIALS_Resp:
+    type: object
+    properties:
+      id:
+        type: string
+        description: Id of the Application Credential. This field uniquely identifies the Application.
+        example: a0f51c7a-******
+      client_id:
+        type: string
+        description: Client-ID of the credential; this is an alternate key.
+        example: wCUd******
+      client_secret:
+        type: string
+        description: Client-Secret of the credential.
+        example: Nvm******
+      appId:
+        type: string
+        description: The Application Identifier to which the credential belong.
+        example: 8df090a-******
+      devId:
+        type: string
+        description: The Developer Identifier.
+        example: fd8c1d0a-******
+      orgId:
+        type: string
+        description: The Developer Operator identifier.
+        example: sb1
+      type:
+        type: string
+        description: The credential type (DEVELOPMENT or PRODUCTION).
+        example: DEVELOPMENT
+      status:
+        type: string
+        description: One of (APPROVED, UNAPPROVED, REJECTED or REVOKED)..
+        example: APPROVED
+      redirectUri:
+        type: string
+        description: The callback uri to which the Oauth responses need to be redirected..
+        example : https://www.degitalapicraft.com
+
+  APP_CREDENTIALS_ALL_Resp:
+    type: object
+    properties:
+      totalRecords:
+        type: number
+        description: Show total number of records available
+        example : 10
+      application:
+        type: array
+        items:
+          $ref: '#/definitions/APP_CREDENTIALS_Resp'
+
+  APP_CREDENTIALS_Req:
+    type: object
+    properties:
+      client_id:
+        type: string
+        description: ID Gateway client_id as returned in the Exchange-Discovery API for a valid operator
+        example: X-c******
+      client_secret:
+        type: string
+        description: ID Gateway client_secret as returned in the Exchange-Discovery API for a valid operator
+        example: X-Br******
+      status:
+        type: string
+        description: An enum of the following values APPROVED, UNAPPROVED, REJECTED, REVOKED
+        example: APPROVED
+      type:
+        type: string
+        description: The credential type (DEVELOPMENT or PRODUCTION).
+        example : DEVELOPMENT
+      redirectUri:
+        type: string
+        description: The callback uri to which the Oauth responses need to be redirected.
+        example: https://www.digitalapicraft.com
+    required:
+      - client_id
+      - client_secret
+      - status
+      - type
+      - redirectUri
+
+  PRODUCT_NAME:
+    type: object
+    properties:
+      name:
+       type: string
+       description: Name of product of organization
+       example: operatorid
+
+  APPLICATION_Req:
+    type: object
+    required:
+      - name
+      - product
+    properties:
+      name:
+        type: string
+        description: This is the Application name
+        example: GSMA-DAC-Test
+      description:
+        type: string
+        description: Optional description field for application description.
+        example: GSMA-DAC-Test application for testing purpose
+      status:
+        type: string
+        description: This is an enum of the following values (Approved, UnApproved, Rejected, Revoked). If not provided, defaulted to Approved/UnApproved depending on autoApproveTrusted/autoApproveUnTrusted flags of the Developer Operator.
+        example: approved
+      product:
+        type: array
+        description: This is a Array of product JSON Object. Each product contains a reference to the name of the product already created in the system. For example 'payment', 'operatorid' and 'messaging'
+        items:
+          $ref: "#/definitions/PRODUCT_NAME"
+
+  CREATE_APP_Resp:
+    type: object
+    properties:
+      id:
+        type: string
+        description: Id of the Application Credential. This field uniquely identifies the Application.
+        example : 049de196********
+      name:
+        type: string
+        description: Name of the application.
+        example: GSMA-DAC-Test1
+      devId:
+        type: string
+        description: Identifier of the developer that the application belongs to.
+        example: 86a1d5f2-********
+      devEmail:
+        type: string
+        description: Developer email iD.
+        example: avinash@digitalapicraft.com
+      devCorrelationId:
+        type: string
+        description: The Developer identifier.
+        example: manual_20161212
+      orgId:
+        type: string
+        description: The Developer operator identifier.
+        example: gsma
+      description:
+        type: string
+        description: Description of application.
+        example: GSMA Test app for DAC
+      status:
+        type: string
+        description: Status of the application,One of (APPROVED, UNAPPROVED, REJECTED or REVOKED)..
+        example: APPROVED
+      product:
+        type: array
+        items:
+          $ref: '#/definitions/PRODUCT_NAME'
+
+  GET_ALL_APP_Resp:
+    type: object
+    properties:
+      totalRecords:
+       type: number
+       description: number of recoreds found
+       example: 10
+      application:
+        type: array
+        items:
+          $ref: "#/definitions/CREATE_APP_Resp"
+
+  DISPLAY_NAME:
+    type: object
+    required:
+      - languageCode
+      - displayName
+    properties:
+      languageCode:
+        type: string
+        description: languageCode
+        example: EN
+      displayName:
+        type: string
+        description: displayName
+        example: English
+
+  APPLICATION:
+    type: object
+    properties:
+      id:
+        type: string
+        description: Id of the Application. This field uniquely identifies the Application.
+        example: 78df090a******
+      name:
+        type: string
+        description: Name of the Application.
+        example: SampleApp
+      description:
+        type: string
+        description: Description of the application
+        example: Sample Application
+      status:
+        type: string
+        description: An enum of the following values APPROVED, UNAPPROVED, REJECTED, REVOKED for both application and developer
+        example: APPROVED
+
+  APP_SHORTNAME_Req:
+    type: object
+    required:
+      - client_name
+      - display_names
+    properties:
+      client_name:
+        type: string
+        description: This is the client name
+        example : apigee_test3
+      description:
+        type: string
+        description: Optional description field
+        example: This is test description
+      display_names:
+        type: array
+        description: This is a Array of product JSON Object. Each display_names contains 'languageCode' and the client display name in the corresponding language.
+        items:
+          $ref: '#/definitions/DISPLAY_NAME'
+
+  CLIENT_Resp:
+    type: object
+    properties:
+      id:
+        type: string
+        description: Id of the Client Name. This field uniquely identifies the Application.
+        example: fb3******
+      client_name:
+        type: string
+        description: Given Client name.
+        example: apigee_test3
+      devId:
+        type: string
+        description: Identifier of the developer that the application belongs to.
+        example: fb7-******
+      orgId:
+        type: string
+        description: The Developer operator identifier.
+        example: GSMA
+      description:
+        type: string
+        description: Description of the application.
+        example: This is the description of application.
+      display_names:
+        type: array
+        description: This JSON array refers to all the given display_names.
+        items:
+          $ref: '#/definitions/DISPLAY_NAME'
+
+  CLIENT_NAME_Resp:
+    type: object
+    properties:
+      devId:
+        type: string
+        description: Application Developer identifier
+        example: fbe3******
+      orgId:
+        type: string
+        description: This element refers to the Developer Operator Organization that the Application belongs to.
+        example: GSMA
+      client_names:
+        type: array
+        items:
+          type: string
+
+  CLIENT_DETAILS_Resp:
+    type: object
+    properties:
+      devId:
+        type: string
+        description: Identifier of the Developer that the Application belongs to
+        example: fd8c1d0a-******
+      orgId:
+        type: string
+        description: >-
+          This element refers to the Developer Operator Organization that the
+          Application belongs to.
+          example: sb1
+      devName:
+        type: string
+        description: Developer Name if the developer belongs to the requested organisation
+        example: xyz
+      client_name:
+        type: string
+        example: GSMA
+        description: It is a string representing the application client name.
+      description:
+        type: string
+        example: this is the description of Client
+        description: It is the description for the Application Client Name
+      application:
+        type: array
+        items:
+          $ref: '#/definitions/APPLICATION'
+      display_names:
+        type: array
+        description: It is an array of objects for display name with language code
+        items:
+          $ref: '#/definitions/DISPLAY_NAME'
+
+  ERROR_400:
+      type: object
+      properties:
+        error:
+          type: string
+          description: |
+            Error for missing client_id/client_secret/status/type/redirectUri/name/status/product.name : "Invalid_Request"
+            example: Invalid_Request
+        description:
+          type: string
+          description: |
+            Description for missing client_id : "apikey/appSecret cannot be empty" | Description for missing client_secret : "apikey/appSecret cannot be empty" |  Description for missing status : "Invalid Status[undefined]" | Description for missing type : "Invalid type[undefined]" | Description for missing redirectUri : "Invalid redirectUri[undefined]" | Description for missing name : "Invalid Application Name" | Description for missing status : "Invalid Status[undefined]" | Description for missingproduct.name : "Invalid Product"
+            example: Invalid Application Name
+
+  ERROR_401:
+    type: object
+    properties:
+      error:
+        type: string
+        example: AUTHENTICATION_FAILED
+        description: |
+          "AUTHENTICATION_FAILED" for Missing Authentication Header scenario
+      description:
+        type: string
+        example: Authorization header missing
+        description: |
+          "Authorization header missing" for Missing Authentication Header scenario
+
+  ERROR_404:
+    type: object
+    properties:
+      error:
+        type: string
+        description: |
+          Error for missing/Invalid orgID : "Not Found" | Error for missing/Invalid devID :  "Not Found" | Error for missing/invalid appID : "Not Found"
+          example: Not Found
+      description:
+        type: string
+        description: |
+          Description for missing orgID : "Requested Resource Not Found" | Description for Invalid orgID : "The Organization is not found in exchange now" | Description for missing devID : "Requested Resource Not Found" | Description for Invalid devID : "Developer Not Found" | Description for Missing/Invalid appID : "Application Not Found"
+          example: Requested Resource Not Found
+
+  ERROR_404_TNC:
+    type: object
+    properties:
+      error:
+        type: string
+        description: |
+          "Not_Found_Entity" for invalid devEmail, invalid tncID
+          example: Not_Found_Entity
+      description:
+        type: string
+        description: |
+          "Developer Not Found" for invalid devEmail | "No Compliance/TnC details for the given TncID" for invalid tncID scenario
+          example: Not Found
+
+  ERROR_500:
+    type: object
+    properties:
+      error:
+        type: string
+      description:
+        type: string
