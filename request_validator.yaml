@@ -92,7 +92,7 @@ paths:
       parameters:
         - in: path
           name: orgID
-          description: Serving Organization ID as created in the Exchange
+          description: Serving Organization ID returned in the Exchange-Discovery API for a valid operator.
           required: true
           type: string
         - in: query
