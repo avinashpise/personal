@@ -12,48 +12,48 @@ info:
 
 
         Below is a sample response of **Discovery API** call. For further details please refer **Discovery API Documentation**.
-
-          {
-            "ttl": 1498963352,
-            "response": {
-              "client_id": "x-ce******",
-              "client_secret": "x-Br******",
-              "serving_operator": "vodafone_spain",
-              "country": "Spain",
-              "currency": "EUR",
-              "client_name": "apigee_test_3",
-              "apis": {
-                "operatorid": {
-                  "link": [
-                    {
-                      "href": "https://idp.mobileconnect.gemalto.com/idp/vodafonespain/oidc/mc/authorize",
-                      "rel": "authorization"
-                    },
-                    {
-                      "href": "https://idp.mobileconnect.gemalto.com/idp/vodafonespain/oidc/mc/token",
-                      "rel": "token"
-                    },
-                    {
-                      "href": "https://idp.mobileconnect.gemalto.com/idp/vodafonespain/oidc/mc/userinfo",
-                      "rel": "userinfo"
-                    },
-                    {
-                      "href": "https://idp.mobileconnect.gemalto.com/idp/vodafonespain/oidc/mc/token",
-                      "rel": "tokenrefresh"
-                    },
-                    {
-                      "href": "https://idp.mobileconnect.gemalto.com/idp/vodafonespain/oidc/mc/revoke",
-                      "rel": "tokenrevoke"
-                    },
-                    {
-                      "href": "https://idp.mobileconnect.gemalto.com/idp/vodafonespain/oidc/mc/userinfo",
-                      "rel": "premiuminfo"
-                    }
-                  ]
+  
+            {
+              "ttl": 1498963352,
+              "response": {
+                "client_id": "x-ce******",
+                "client_secret": "x-Br******",
+                "serving_operator": "vodafone_spain",
+                "country": "Spain",
+                "currency": "EUR",
+                "client_name": "apigee_test_3",
+                "apis": {
+                  "operatorid": {
+                    "link": [
+                      {
+                        "href": "https://idp.mobileconnect.gemalto.com/idp/vodafonespain/oidc/mc/authorize",
+                        "rel": "authorization"
+                      },
+                      {
+                        "href": "https://idp.mobileconnect.gemalto.com/idp/vodafonespain/oidc/mc/token",
+                        "rel": "token"
+                      },
+                      {
+                        "href": "https://idp.mobileconnect.gemalto.com/idp/vodafonespain/oidc/mc/userinfo",
+                        "rel": "userinfo"
+                      },
+                      {
+                        "href": "https://idp.mobileconnect.gemalto.com/idp/vodafonespain/oidc/mc/token",
+                        "rel": "tokenrefresh"
+                      },
+                      {
+                        "href": "https://idp.mobileconnect.gemalto.com/idp/vodafonespain/oidc/mc/revoke",
+                        "rel": "tokenrevoke"
+                      },
+                      {
+                        "href": "https://idp.mobileconnect.gemalto.com/idp/vodafonespain/oidc/mc/userinfo",
+                        "rel": "premiuminfo"
+                      }
+                    ]
+                  }
                 }
               }
             }
-          }
 
 
 host: discover.mobileconnect.io
