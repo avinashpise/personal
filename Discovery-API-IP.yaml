@@ -18,19 +18,20 @@ paths:
       summary: Fetching Operator Detail from IP Discovery
       description: |
         A discovery request is made by the application 'X-Using-Mobile-Data: true' header.
-        
+
         **Valid Responses**
-        
+
         Below will be the response for valid request
 
-        | Scenario                 | Parameters                    | Status Code | Description                 |
-        |--------------------------|-------------------------------|-------------|-----------------------------|
-        | With X-Source-IP | Redirect_URL                  | 202 | Get the operator selection web page |
+        | Scenario              | Parameters           | Status Code           | Description                 |
+        |-----------------------|----------------------|-----------------------|-----------------------------|
+        | With MCC/MNC Pair     | Identified-MCC, Identified-MNC, Redirect_URL | 200 | If Mcc/Mnc is valid and if the Accept header is 'application/json'. The cookies are set based on 'Remember Me' selection in the UI. If Enum-Nonce cookie is reset, as this is not a MSISDN based discovery. |
+        | With out MCC/MNC Pair | Redirect_URL                                 | 202 | Get the operator selection web page |
 
         **Error Responses**
-        
+
          Below will be the response for valid request
-         
+
         | Scenario                     | Status           | Error               | Description                 |
         |------------------------------|------------------|---------------------|-----------------------------|
         | Missing Redirect_URL         | 400 Bad Request  | Invalid_Request     | Redirect_URL missing |
@@ -71,6 +72,10 @@ paths:
       - BasicAuth: []
       responses:
         200:
+          description: Successful response
+          schema:
+            $ref: "#/definitions/MNC_MCC_Discovery_Resp"      
+        202:
           description: Accepted
           schema:
             $ref: "#/definitions/IP_Discovery_OpSelection_Resp"
@@ -104,13 +109,12 @@ definitions:
     properties:
       rel:
         type: string
-        description: Method Name 
+        description: Method Name
         example: operatorSelection
       href:
         type: string
         description: Method API url
         example: https://exchange-i-test.dn.apigee.net/apigee_monitor/v2/discovery/operator-selection?session_id=U7GXhTcpDAiLNJPpst6B4ai1rclnlVYe5h23UQMX6DweaRdEew&ext_session_id=3qb0qnoIqXz4mCFbiYsCMgmcRLytBhZVCDB51zpUPdg1PIAVx561pb0Yavusucb6Aa88T3YUhEipljhwpnnVggs6kNx5qOv0s1XcG6%2FPCxarmE%2Bs9qbl
-
   DiscoveryError:
     type: object
     properties:
@@ -122,3 +126,53 @@ definitions:
         type: string
         description: Redirect_URL missing for Missing Redirect_URL scenario | "Your request needs a valid session or valid credentials" for Missing Authorization Header scenario
         example: Redirect_URL missing
+ 
+  MNC_MCC_Discovery_Resp:
+    type: object
+    properties:
+      ttl:
+        type: integer
+        format: int64
+        description: Time To Live of data in a computer or network in miliseconds
+        example: 1498963352
+      response:
+        type: object
+        properties:
+          client_id:
+            type: string
+            description: ID Gateway client_id as returned in the Exchange-Discovery API for a valid operator
+            example: X-c******
+          client_secret:
+            type: string
+            description: ID Gateway client_secret as returned in the Exchange-Discovery API for a valid operator
+            example: X-Br******
+          serving_operator:
+            type: string
+            description: Serving Operator as created in the Exchange
+            example: vodafone_spain
+          country:
+            type: string
+            description: Country of Serving Operator
+            example: Spain
+          currency:
+            type: string
+            description: Currency of Serving Operator Country
+            example: EUR
+          client_name:
+            type: string
+            description: Client Name of Serving Operator
+            example: apigee_test_3
+          apis:
+            type: object
+            description: List of Operator APIs
+            properties:
+              operatorid:
+                type: object
+                properties:
+                  link:
+                    type: array
+                    description: Array of Operator API Links
+                    items:
+                      $ref: "#/definitions/OperatorLink"
+
+
