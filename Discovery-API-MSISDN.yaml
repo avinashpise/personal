@@ -16,7 +16,7 @@ paths:
   /{org_name}/v2/discovery:
     post:
       operationId: MSISDN-DISCOVERY-POST
-      summary: Posting Operator Detail from MSISDN Discovery
+      summary: Posting MSISDN to retrive Operator Details
       description: |
         **Valid Responses**
 
