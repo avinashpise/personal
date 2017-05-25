@@ -44,7 +44,7 @@ paths:
       parameters:
         - name: org_name
           in: path
-          description: Serving Operator  Organization Name
+          description: Serving Operator (MNO) Organization Name
           required: true
           type: string
         - name: Accept
@@ -97,11 +97,11 @@ paths:
         401:
           description: Unauthorized
           schema:
-            $ref: "#/definitions/DiscoveryError"
+            $ref: "#/definitions/DiscoveryError401"
         404:
           description: Not Found (Wrong or Unsupported msisdn)
           schema:
-            $ref: "#/definitions/DiscoveryError"
+            $ref: "#/definitions/DiscoveryError404"
 
 # Security Definitions
 securityDefinitions:
@@ -160,7 +160,7 @@ definitions:
                     type: array
                     description: Array of Operator API Links
                     items:
-                      $ref: "#/definitions/OperatorLink"
+                      $ref: "#/definitions/OperatorLinks"
 
   MSISDN_Discovery_OpSelection_Resp:
     type: object
@@ -171,7 +171,7 @@ definitions:
         items:
           $ref: "#/definitions/OperatorLink"
 
-  OperatorLink:
+  OperatorLinks:
     type: object
     properties:
       href:
@@ -183,7 +183,30 @@ definitions:
         description: Method Name like authorization,token,userinfo,tokenrevoke,operatorSelection,premiuminfo etc
         example: authorization
 
+  OperatorLink:
+    type: object
+    properties:
+      href:
+        type: string
+        description: Method API url for operator selection UI flow with session id
+        example: https://exchange-i-test.dn.apigee.net/apigee_monitor/v2/discovery/operator-selection?session_id=U7GXhTcpDAiLNJPpst6B4ai1rclnlVYe5h23UQMX6DweaRdEew&ext_session_id=3qb0qnoIqXz4mCFbiYsCMgmcRLytBhZVCDB51zpUPdg1PIAVx561pb0Yavusucb6Aa88T3YUhEipljhwpnnVggs6kNx5qOv0s1XcG6%2FPCxarmE%2Bs9qbl
+      rel:
+        type: string
+        description: Method Name like operatorSelection
+        example: operatorSelection
+
   DiscoveryError:
+    type: object
+    properties:
+      error:
+        type: string
+        description: "'Invalid_Request' for Missing Redirect_URL scenario | 'Unauthorized_Access' for Missing Authorization Header scenario | 'Not_Found_Entity' for Wrong msisdn and Unsupported msisdn scenarios"
+        example: Invalid_Request
+      description:
+        type: string
+        example: Redirect_URL missing
+        description: "'Redirect_URL missing' for Missing Redirect_URL scenario | 'Your request needs a valid session or valid credentials' for Missing Authorization Header scenario | 'We could not find your operator based on the MSISDN supplied' for Wrong msisdn scenario and 'Operator not supported' for the MSISDN supplied for Unsupported msisdn scenario"
+  DiscoveryError401:
     type: object
     properties:
       error:
@@ -193,4 +216,15 @@ definitions:
       description:
         type: string
         example: Your request needs a valid session or valid credentials
+        description: "'Redirect_URL missing' for Missing Redirect_URL scenario | 'Your request needs a valid session or valid credentials' for Missing Authorization Header scenario | 'We could not find your operator based on the MSISDN supplied' for Wrong msisdn scenario and 'Operator not supported' for the MSISDN supplied for Unsupported msisdn scenario"
+  DiscoveryError404:
+    type: object
+    properties:
+      error:
+        type: string
+        description: "'Invalid_Request' for Missing Redirect_URL scenario | 'Unauthorized_Access' for Missing Authorization Header scenario | 'Not_Found_Entity' for Wrong msisdn and Unsupported msisdn scenarios"
+        example: Not_Found_Entity
+      description:
+        type: string
+        example: We could not find your operator based on the MSISDN supplied
         description: "'Redirect_URL missing' for Missing Redirect_URL scenario | 'Your request needs a valid session or valid credentials' for Missing Authorization Header scenario | 'We could not find your operator based on the MSISDN supplied' for Wrong msisdn scenario and 'Operator not supported' for the MSISDN supplied for Unsupported msisdn scenario"
