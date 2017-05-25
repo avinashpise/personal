@@ -19,7 +19,7 @@ paths:
       summary: Posting Operator Detail from MSISDN Discovery
       description: |
         **Valid Responses**
-        
+
         Below will be the response for valid request
 
         | Scenario             | Parameters           | Status Code              | Description                 |
@@ -27,10 +27,10 @@ paths:
         | With MSISDN          | msisdn, Redirect_URL    | 200 | Direct discovery response with cookies set. Note the Enum-Nonce cookie - this is returned only for MSISDN based discovery. Also note the subscriber_id parameter in the response payload |
         | With MSISDN, Ignore-Cookies | Redirect_URL | 200 | Same as above |
         | With out MSISDN      | Redirect_URL | 202 | Get the operator selection web page |
-        
-        
-        **Error Responses** 
-        
+
+
+        **Error Responses**
+
         Below will be the response for invalid request
 
         | Scenario             | Status          | Error                    | Description                 |
@@ -44,7 +44,7 @@ paths:
       parameters:
         - name: org_name
           in: path
-          description: Serving Organization Name
+          description: Serving Operator  Organization Name
           required: true
           type: string
         - name: Accept
@@ -176,11 +176,11 @@ definitions:
     properties:
       href:
         type: string
-        description: Method API
+        description: Method API url for operator selection UI flow with session id
         example: https://idp.mobileconnect.gemalto.com/idp/vodafonespain/oidc/mc/authorize
       rel:
         type: string
-        description: Method Name
+        description: Method Name like authorization,token,userinfo,tokenrevoke,operatorSelection,premiuminfo etc
         example: authorization
 
   DiscoveryError:
@@ -188,9 +188,9 @@ definitions:
     properties:
       error:
         type: string
-        description: Invalid_Request for Missing Redirect_URL scenario | "Unauthorized_Access" for Missing Authorization Header scenario | "Not_Found_Entity" for Wrong msisdn and Unsupported msisdn scenarios
+        description: "'Invalid_Request' for Missing Redirect_URL scenario | 'Unauthorized_Access' for Missing Authorization Header scenario | 'Not_Found_Entity' for Wrong msisdn and Unsupported msisdn scenarios"
         example: Unauthorized_Access
       description:
         type: string
         example: Your request needs a valid session or valid credentials
-        description: Redirect_URL missing for Missing Redirect_URL scenario | "Your request needs a valid session or valid credentials" for Missing Authorization Header scenario | "We could not find your operator based on the MSISDN supplied" for Wrong msisdn scenario and "Operator not supported for the MSISDN supplied" for Unsupported msisdn scenario
+        description: "'Redirect_URL missing' for Missing Redirect_URL scenario | 'Your request needs a valid session or valid credentials' for Missing Authorization Header scenario | 'We could not find your operator based on the MSISDN supplied' for Wrong msisdn scenario and 'Operator not supported' for the MSISDN supplied for Unsupported msisdn scenario"
