@@ -102,13 +102,13 @@ paths:
       description: |
         **Pre-requisites**
 
-        * The Developer Operator Organization must be on-boarded on to Exchange.
+        * The Developer Operator (Service Provider) Organization must be on-boarded on to Exchange.
 
         * A valid Operator username and password should be issued.
 
         * There is a valid Developer with the given devId.
 
-        * Valid products must be enabled for the Developer Operator organization. This is carried out at the time of provisioning the Developer Operator onto the Exchange. This information should also be available in the Operator Portal.
+        * Valid products must be enabled for the Developer Operator (Service Provider) organization. This is carried out at the time of provisioning the Developer Operator onto the Exchange. This information should also be available in the Operator Portal.
 
         * The Client name should be valid.
 
@@ -129,7 +129,7 @@ paths:
       parameters:
         - in: path
           name: orgId
-          description: String representing the Developer Operator Organization ID as created in the Exchange
+          description: String representing the Developer Operator (Service Provider) Organization ID as created in the Exchange
           required: true
           type: string
         - in: path
@@ -188,12 +188,12 @@ paths:
       parameters:
         - in: path
           name: orgId
-          description: Organization ID as created in the Exchange
+          description: String representing the Developer Operator (Service Provider) Organization ID as created in the Exchange
           required: true
           type: string
         - in: path
           name: devId
-          description: Developer ID as created in the Exchange
+          description: Developer email is the primary key used as Developer ID
           required: true
           type: string
         - name: Content-Type
@@ -249,12 +249,12 @@ paths:
       parameters:
         - in: path
           name: orgId
-          description: Organization ID as created in the Exchange
+          description: String representing the Developer Operator (Service Provider) Organization ID as created in the Exchange
           required: true
           type: string
         - in: path
           name: devId
-          description: Developer ID as created in the Exchange
+          description: Developer email is the primary key used as Developer ID
           required: true
           type: string
         - in: path
@@ -320,12 +320,12 @@ paths:
       parameters:
         - in: path
           name: orgId
-          description: Organization ID as created in the Exchange
+          description: String representing the Developer Operator (Service Provider) Organization ID as created in the Exchange
           required: true
           type: string
         - in: path
           name: devId
-          description: Developer ID as created in the Exchange
+          description: Developer email is the primary key used as Developer ID
           required: true
           type: string
         - in: path
@@ -390,12 +390,12 @@ paths:
       parameters:
         - in: path
           name: orgId
-          description: Organization ID as created in the Exchange
+          description: String representing the Developer Operator (Service Provider) Organization ID as created in the Exchange
           required: true
           type: string
         - in: path
           name: devId
-          description: Developer ID as created in the Exchange
+          description: Developer email is the primary key used as Developer ID
           required: true
           type: string
         - in: path
@@ -465,12 +465,12 @@ paths:
       parameters:
         - in: path
           name: orgId
-          description: Organization ID as created in the Exchange
+          description: String representing the Developer Operator (Service Provider) Organization ID as created in the Exchange
           required: true
           type: string
         - in: path
           name: devId
-          description: Developer ID as created in the Exchange
+          description: Developer email is the primary key used as Developer ID
           required: true
           type: string
         - in: path
@@ -532,12 +532,12 @@ paths:
       parameters:
         - in: path
           name: orgId
-          description: Organization ID as created in the Exchange
+          description: String representing the Developer Operator (Service Provider) Organization ID as created in the Exchange
           required: true
           type: string
         - in: path
           name: devId
-          description: Developer ID as created in the Exchange
+          description: Developer email is the primary key used as Developer ID
           required: true
           type: string
         - in: path
@@ -604,12 +604,12 @@ paths:
       parameters:
         - in: path
           name: orgId
-          description: Organization ID as created in the Exchange
+          description: String representing the Developer Operator (Service Provider) Organization ID as created in the Exchange
           required: true
           type: string
         - in: path
           name: devId
-          description: Developer ID as created in the Exchange
+          description: Developer email is the primary key used as Developer ID
           required: true
           type: string
         - in: path
@@ -664,7 +664,7 @@ paths:
       parameters:
         - name: orgId
           in: path
-          description: Organization ID as created in the Exchange
+          description: String representing the Developer Operator (Service Provider) Organization ID as created in the Exchange
           required: true
           type: string
         - name: limit
@@ -713,7 +713,7 @@ paths:
       parameters:
         - name: orgId
           in: path
-          description: Organization ID as created in the Exchange
+          description: String representing the Developer Operator (Service Provider) Organization ID as created in the Exchange
           required: true
           type: string
         - name: Accept
@@ -802,12 +802,12 @@ paths:
       parameters:
         - name: orgId
           in: path
-          description: Organization ID as created in the Exchange
+          description: String representing the Developer Operator (Service Provider) Organization ID as created in the Exchange
           required: true
           type: string
         - name: devId
           in: path
-          description: Developer ID as created in the Exchange
+          description: Developer email is the primary key used as Developer ID
           required: true
           type: string
         - name: Accept
@@ -850,12 +850,12 @@ paths:
       parameters:
         - name: orgId
           in: path
-          description: Organization ID as created in the Exchange
+          description: String representing the Developer Operator (Service Provider) Organization ID as created in the Exchange
           required: true
           type: string
         - name: devId
           in: path
-          description: Developer ID as created in the Exchange
+          description: Developer email is the primary key used as Developer ID
           required: true
           type: string
         - name: Accept
@@ -1020,12 +1020,12 @@ paths:
       parameters:
         - in: path
           name: orgId
-          description: Organization ID as created in the Exchange
+          description: String representing the Developer Operator (Service Provider) Organization ID as created in the Exchange
           required: true
           type: string
         - in: path
           name: devId
-          description: Developer ID as created in the Exchange
+          description: Developer email is the primary key used as Developer ID
           required: true
           type: string
         - name: Content-Type
@@ -1080,12 +1080,12 @@ paths:
       parameters:
         - in: path
           name: orgId
-          description: Organization ID as created in the Exchange
+          description: String representing the Developer Operator (Service Provider) Organization ID as created in the Exchange
           required: true
           type: string
         - in: path
           name: devId
-          description: Developer ID as created in the Exchange
+          description: Developer email is the primary key used as Developer ID
           required: true
           type: string
         - in: path
@@ -1138,12 +1138,12 @@ paths:
       parameters:
         - in: path
           name: orgId
-          description: Organization ID as created in the Exchange
+          description: String representing the Developer Operator (Service Provider) Organization ID as created in the Exchange
           required: true
           type: string
         - in: path
           name: devId
-          description: Developer ID as created in the Exchange
+          description: Developer email is the primary key used as Developer ID
           required: true
           type: string
         - in: path
@@ -1206,12 +1206,12 @@ paths:
       parameters:
         - in: path
           name: orgId
-          description: Organization ID as created in the Exchange
+          description: String representing the Developer Operator (Service Provider) Organization ID as created in the Exchange
           required: true
           type: string
         - in: path
           name: devId
-          description: Developer ID as created in the Exchange
+          description: Developer email is the primary key used as Developer ID
           required: true
           type: string
         - in: path
@@ -1256,7 +1256,7 @@ paths:
       parameters:
         - in: path
           name: orgId
-          description: Organization ID as created in the Exchange
+          description: String representing the Developer Operator (Service Provider) Organization ID as created in the Exchange
           required: true
           type: string
         - in: query
@@ -1294,7 +1294,7 @@ paths:
       parameters:
         - name: orgId
           in: path
-          description: Organization ID as created in the Exchange
+          description: String representing the Developer Operator (Service Provider) Organization ID as created in the Exchange
           required: true
           type: string
         - name: devEmail
@@ -1351,7 +1351,7 @@ paths:
       parameters:
         - name: orgId
           in: path
-          description: Organization ID as created in the Exchange
+          description: String representing the Developer Operator (Service Provider) Organization ID as created in the Exchange
           required: true
           type: string
         - name: devEmail
@@ -1422,7 +1422,7 @@ paths:
       parameters:
         - name: orgId
           in: path
-          description: Organization ID as created in the Exchange
+          description: String representing the Developer Operator (Service Provider) Organization ID as created in the Exchange
           required: true
           type: string
         - name: Accept
@@ -1455,7 +1455,7 @@ paths:
       parameters:
         - name: orgId
           in: path
-          description: Organization ID as created in the Exchange
+          description: String representing the Developer Operator (Service Provider) Organization ID as created in the Exchange
           required: true
           type: string
         - name: devEmail
@@ -1512,7 +1512,7 @@ paths:
       parameters:
         - name: orgId
           in: path
-          description: Organization ID as created in the Exchange
+          description: String representing the Developer Operator (Service Provider) Organization ID as created in the Exchange
           required: true
           type: string
         - name: devEmail
@@ -1584,7 +1584,7 @@ paths:
       parameters:
         - name: orgId
           in: path
-          description: Organization ID as created in the Exchange
+          description: String representing the Developer Operator (Service Provider) Organization ID as created in the Exchange
           required: true
           type: string
         - name: devEmail
@@ -1685,7 +1685,7 @@ definitions:
     properties:
       id:
         type: string
-        description: A system generated identifier that uniquely represents the Developer entity
+        description: A system generated identifier that uniquely represents the Developer entity.
         example: fb3******
       email:
         type: string
@@ -1693,7 +1693,7 @@ definitions:
         example: avinash@digitalapicraft.com
       orgId:
         type: string
-        description: Operator identifier
+        description: Developer Operator (Service Provider) Organization ID
         example: GSMA-TEST
       fullName:
         type: string
@@ -1705,7 +1705,7 @@ definitions:
         example: Digital Api Craft
       correlationId:
         type: string
-        description: The developer identifier used in Operators' system (in the system of records for Developer)
+        description: The developer identifier used in Developer Operators' (Service Provider) system (in the system of records for Developer)
         example: manual_20170427
       status:
         type: string
