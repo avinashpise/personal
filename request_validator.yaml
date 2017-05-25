@@ -72,10 +72,10 @@ paths:
         Serving organization validates this ID Gateway credentials using the Serving organization cache or Request Validator API call.
 
         The Serving Organization retrieves the Application and Developer data to allow on Authentication Scheme.
-        
+
 
         **Error Scenarios**
-        
+
         Below will be the error scenarios for invalid request
 
           | Scenario             | Status           | Error                    | Description                 |
@@ -92,7 +92,7 @@ paths:
       parameters:
         - in: path
           name: orgID
-          description: Serving Organization ID returned in the Exchange-Discovery API for a valid operator.
+          description: Serving Operator (MNO) Organization ID returned in the Exchange-Discovery API for a valid operator.
           required: true
           type: string
         - in: query
@@ -146,7 +146,7 @@ definitions:
       name:
         type: string
         example: operatorid
-        
+
   error400:
     type: object
     properties:
@@ -172,7 +172,7 @@ definitions:
         description: |
           Description for mising authentication header : "Authorization header missing" | Description for invalid client_secret :  "Invalid Client Secret"
         example: Authorization header missing
-        
+
   error404:
     type: object
     properties:
@@ -209,76 +209,76 @@ definitions:
           type: string
           description: A unique Developer App Credential Identifier
           example: f08da69a-a325-11e4-9ed8-dfa65b5c4203
-          
+
          devOrgId:
           type: string
           description: Developer Organization identifier
           example: apigee_monitor
-          
+
          devName:
           type: string
           description: Name of the developer
           example: Apigee Monitor
-          
+
          devId:
           type: string
           description: Developer's Id
           example: b4cbd4fa-a317-11e4-8b79-f5ed6bafda6a
-          
+
          appName:
           type: string
           description: Application name
           example: APIHealth
-          
+
          description:
           type: string
           description: Application Description
           example: Exchange Monitoring using API Health
-          
+
          appStatus:
           type: string
           description: Application's current status (APPROVED, UNAPPROVED, REVOKED or REJECTED)
           example: APPROVED
-          
+
          devStatus:
           type: string
           description:  Developer's current status (APPROVED, UNAPPROVED, REVOKED or REJECTED).
           example: Approved
-          
+
          developerType:
           type: string
           description:  Developer type (TRUSTED/UNTRUSTED).
           example: UNTRUSTED
-          
+
          tncStatus:
           type: string
           description:  Serving Organization Terms and conditions accepted or unaccepted by the developer (ACCEPTED/UNACCEPTED).
           example: UNACCEPTED
-          
+
          trustedMode:
           type: string
           description: level of trust
           example: 999
-          
+
          appType:
           type: string
           description: Application's type (PRODUCTION or DEVELOPMENT)
           example: DEVELOPMENT
-          
+
          redirectUri:
           type: string
           description: Applications redirect URI
           example: https://api.exchange.gsma.com
-          
+
          supportedApis:
           type: array
           description: JSON Array of the APIs used by the Application
           items:
             $ref: '#/definitions/name'
-            
+
       client_name:
         type: object
-        properties: 
+        properties:
            name:
             type: string
             description: It is a application client name.
