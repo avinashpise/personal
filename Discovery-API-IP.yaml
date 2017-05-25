@@ -86,11 +86,11 @@ paths:
         400:
           description: Bad Request
           schema:
-            $ref: "#/definitions/DiscoveryError"
+            $ref: "#/definitions/DiscoveryError400"
         401:
           description: Unauthorized
           schema:
-            $ref: "#/definitions/DiscoveryError"
+            $ref: "#/definitions/DiscoveryError401"
 
 # Security Definitions
 securityDefinitions:
@@ -105,7 +105,7 @@ definitions:
       ttl:
         type: integer
         format: int64
-        description: Time To Live of data in a computer or network in miliseconds
+        description: Time To Live client_id and client_secrate in seconds
         example: 1498963352
       response:
         type: object
@@ -145,7 +145,7 @@ definitions:
                     type: array
                     description: Array of Operator API Links
                     items:
-                      $ref: "#/definitions/OperatorLink"
+                      $ref: "#/definitions/OperatorLinks"
 
   IP_Discovery_OpSelection_Resp:
     type: object
@@ -156,19 +156,31 @@ definitions:
         items:
           $ref: "#/definitions/OperatorLink"
 
+  OperatorLinks:
+    type: object
+    properties:
+      rel:
+        type: string
+        description: Method Name like authorization,token,userinfo,tokenrevoke,premiuminfo etc
+        example: authorization
+      href:
+        type: string
+        description: Method API url for operator selection UI flow with session id
+        example: https://exchange-i-test.dn.apigee.net/oauth/telenor_pakistan/authorize
+
   OperatorLink:
     type: object
     properties:
       rel:
         type: string
-        description: Method Name like authorization,token,userinfo,tokenrevoke,operatorSelection,premiuminfo etc
+        description: Method Name like operatorSelection
         example: operatorSelection
       href:
         type: string
         description: Method API url for operator selection UI flow with session id
         example: https://exchange-i-test.dn.apigee.net/apigee_monitor/v2/discovery/operator-selection?session_id=U7GXhTcpDAiLNJPpst6B4ai1rclnlVYe5h23UQMX6DweaRdEew&ext_session_id=3qb0qnoIqXz4mCFbiYsCMgmcRLytBhZVCDB51zpUPdg1PIAVx561pb0Yavusucb6Aa88T3YUhEipljhwpnnVggs6kNx5qOv0s1XcG6%2FPCxarmE%2Bs9qbl
 
-  DiscoveryError:
+  DiscoveryError400:
     type: object
     properties:
       error:
@@ -179,3 +191,15 @@ definitions:
         type: string
         description: "'Redirect_URL missing' for Missing Redirect_URL scenario | 'Your request needs a valid session or valid credentials' for Missing Authorization Header scenario"
         example: Redirect_URL missing
+
+  DiscoveryError401:
+    type: object
+    properties:
+      error:
+        type: string
+        description: "'Invalid_Request' for Missing Redirect_URL scenario | 'Unauthorized_Access' for Missing Authorization Header scenario"
+        example: Unauthorized_Access
+      description:
+        type: string
+        description: "'Redirect_URL missing' for Missing Redirect_URL scenario | 'Your request needs a valid session or valid credentials' for Missing Authorization Header scenario"
+        example: Your request needs a valid session or valid credentials missing
