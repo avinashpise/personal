@@ -19,7 +19,7 @@ paths:
       summary: Fetching Operator Detail from MCC / MNC Discovery
       description: |
         **Valid Responses**
-        
+
         Below will be the response for valid request
 
         | Scenario             | Parameters           | Status Code              | Description                 |
@@ -29,10 +29,10 @@ paths:
         | With MCC/MNC Pair, Set-Cookies     | Identified-MCC, Identified-MNC, Redirect_URL, Set-Cookies     | 200 |  The response does not set any cookies. And all cookies were anyway reset in the previous response |
         | With MCC/MNC Pair, Manually-Select | Identified-MCC, Identified-MNC, Redirect_URL, Manually-Select | 202 | Response is a redirect to the operator selection web page, where the user can either select an operator or or submit his/her MSISDN. Make sure to URL encode the parameters, when needed. The submitted request will look like below |
         | With out MCC/MNC Pair              | Redirect_URL | 202 | Get the operator selection web page |
-        
-        **Error Responses** 
-        
-        Below will be the error scenario for invalid request 
+
+        **Error Responses**
+
+        Below will be the error scenario for invalid request
 
         | Scenario             | Status               | Error                    | Description                 |
         |----------------------|----------------------|--------------------------|-----------------------------|
@@ -40,13 +40,13 @@ paths:
         | Missing Identified-MNC       | 400 Bad Request | Invalid_Request     | The Mnc value is not specified in this discovery request |
         | Missing Identified-MCC       | 400 Bad Request | Invalid_Request     | The Mcc value is not specified in this discovery request |
         | Missing Authorization Header | 401 Unauthorized | Unauthorized_Access | Your request needs a valid session or valid credentials |
-        | Wrong MCC/MNC Pair           | 404 Not Found | Not_Found_Entity    | There is no organization with the specified mcc/mnc pair |        
+        | Wrong MCC/MNC Pair           | 404 Not Found | Not_Found_Entity    | There is no organization with the specified mcc/mnc pair |
       produces:
       - application/json
       parameters:
         - name: org_name
           in: path
-          description: Serving Organization name as created in the Exchange
+          description: Serving Operator (MNO) Organization  name as created in the Exchange
           required: true
           type: string
         - name: Accept
@@ -75,11 +75,11 @@ paths:
           type: string
         - name: Ignore-Cookies
           in: query
-          description: Ignore(true/false) Cookies for request 
+          description: Ignore(true/false) Cookies for request
           type: boolean
         - name: Set-Cookies
           in: query
-          description: Set(true/false) Cookies for request 
+          description: Set(true/false) Cookies for request
           type: boolean
         - name: Manually-Select
           in: query
@@ -110,17 +110,17 @@ paths:
       summary: Posting Operator Detail from MCC / MNC Discovery
       description: |
         **Valid Responses**
-        
+
         Below will be the response for valid request
 
         | Scenario              | Parameters           | Status Code           | Description                 |
         |-----------------------|----------------------|-----------------------|-----------------------------|
         | With MCC/MNC Pair     | Identified-MCC, Identified-MNC, Redirect_URL | 200 | If Mcc/Mnc is valid and if the Accept header is 'application/json'. The cookies are set based on 'Remember Me' selection in the UI. If Enum-Nonce cookie is reset, as this is not a MSISDN based discovery. |
         | With out MCC/MNC Pair | Redirect_URL                                 | 202 | Get the operator selection web page |
-        
-        **Error Responses** 
-        
-        Below will be the error scenario for invalid request 
+
+        **Error Responses**
+
+        Below will be the error scenario for invalid request
 
         | Scenario             | Status               | Error                    | Description                 |
         |----------------------|----------------------|--------------------------|-----------------------------|
@@ -128,13 +128,13 @@ paths:
         | Missing Identified-MNC       | 400 Bad Request | Invalid_Request     | The Mnc value is not specified in this discovery request |
         | Missing Identified-MCC       | 400 Bad Request | Invalid_Request     | The Mcc value is not specified in this discovery request |
         | Missing Authorization Header | 401 Unauthorized | Unauthorized_Access | Your request needs a valid session or valid credentials |
-        | Wrong MCC/MNC Pair           | 404 Not Found | Not_Found_Entity    | There is no organization with the specified mcc/mnc pair |        
+        | Wrong MCC/MNC Pair           | 404 Not Found | Not_Found_Entity    | There is no organization with the specified mcc/mnc pair |
       produces:
       - application/json
       parameters:
         - name: org_name
           in: path
-          description: Serving Organization Name
+          description: Serving Operator (MNO) Organization  Name
           required: true
           type: string
         - name: Accept
@@ -168,7 +168,7 @@ paths:
               Identified-MNC:
                 type: integer
                 format: int64
-                description: Identified Mobile Network Codes 
+                description: Identified Mobile Network Codes
                 example: 01
               Redirect_URL:
                 type: string
@@ -263,21 +263,21 @@ definitions:
     properties:
       href:
         type: string
-        description: Method API        
+        description: Method API url for operator selection UI flow with session id
         example: https://idp.mobileconnect.gemalto.com/idp/vodafonespain/oidc/mc/authorize
       rel:
         type: string
-        description: Method Name
-        example: authorization        
+        description: Method Name like authorization,token,userinfo,tokenrevoke,operatorSelection,premiuminfo etc
+        example: authorization
 
   DiscoveryError:
     type: object
     properties:
       error:
         type: string
-        description: Invalid_Request for Missing Redirect_URL, Missing Identified-MNC, Missing Identified-MCC scenarios | "Unauthorized_Access" for Missing Authorization Header scenario | "Not_Found_Entity" for Wrong MCC/MNC Pair scenario
+        description: "'Invalid_Request' for Missing Redirect_URL, Missing Identified-MNC, Missing Identified-MCC scenarios | 'Unauthorized_Access' for Missing Authorization Header scenario | 'Not_Found_Entity' for Wrong MCC/MNC Pair scenario"
         example: Invalid_Request
       description:
         type: string
         example: Redirect_URL missing
-        description: Redirect_URL missing for Missing Redirect_URL, "The Mnc value is not specified in this discovery request" for Missing Identified-MNC, "The Mcc value is not specified in this discovery request" for Missing Identified-MCC scenarios | Redirect_URL missing for Missing Redirect_URL scenario | "Your request needs a valid session or valid credentials" for Missing Authorization Header scenario | "There is no organization with the specified mcc/mnc pair" for Wrong MCC/MNC Pair scenario
+        description: "'Redirect_URL missing' for Missing Redirect_URL, 'The Mnc value is not specified in this discovery request' for Missing Identified-MNC, 'The Mcc value is not specified in this discovery request' for Missing Identified-MCC scenarios | 'Redirect_URL missing' for Missing Redirect_URL scenario | 'Your request needs a valid session or valid credentials' for Missing Authorization Header scenario | 'There is no organization with the specified mcc/mnc pair' for Wrong MCC/MNC Pair scenario"
