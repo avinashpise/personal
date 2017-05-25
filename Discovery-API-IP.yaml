@@ -25,8 +25,8 @@ paths:
 
         | Scenario              | Parameters           | Status Code           | Description                 |
         |-----------------------|----------------------|-----------------------|-----------------------------|
-        | With MCC/MNC Pair     | Identified-MCC, Identified-MNC, Redirect_URL | 200 | If Mcc/Mnc is valid and if the Accept header is 'application/json'. The cookies are set based on 'Remember Me' selection in the UI. If Enum-Nonce cookie is reset, as this is not a MSISDN based discovery. |
-        | With out MCC/MNC Pair | Redirect_URL                                 | 202 | Get the operator selection web page |
+        | With Valid X-Source-IP, Local-Client-IP | X-Source-IP, Local-Client-IP, Redirect_URL | 200 | Get the discovery response |
+        | With Invalid/Missing X-Source-IP, Local-Client-IP | X-Source-IP, Local-Client-IP, Redirect_URL | 202 | Get the operator selection web page |
 
         **Error Responses**
 
@@ -41,7 +41,7 @@ paths:
       parameters:
         - name: org_name
           in: path
-          description: Serving Organization ID as created in the Exchange
+          description: Serving Operator (MNO) Organization ID  as created in the Exchange
           required: true
           type: string
         - name: Accept
@@ -68,13 +68,17 @@ paths:
           description: Redirect URL of application
           required: true
           type: string
+        - name: Local-Client-IP
+          in: query
+          description: Local Client IP address
+          type: string
       security:
       - BasicAuth: []
       responses:
         200:
           description: Successful response
           schema:
-            $ref: "#/definitions/MNC_MCC_Discovery_Resp"      
+            $ref: "#/definitions/IP_Discovery_Resp"
         202:
           description: Accepted
           schema:
@@ -95,39 +99,7 @@ securityDefinitions:
 
 # Definitions
 definitions:
-  IP_Discovery_OpSelection_Resp:
-    type: object
-    properties:
-      links:
-        type: array
-        description: Array of Operator API Links
-        items:
-          $ref: "#/definitions/OperatorLink"
-
-  OperatorLink:
-    type: object
-    properties:
-      rel:
-        type: string
-        description: Method Name
-        example: operatorSelection
-      href:
-        type: string
-        description: Method API url
-        example: https://exchange-i-test.dn.apigee.net/apigee_monitor/v2/discovery/operator-selection?session_id=U7GXhTcpDAiLNJPpst6B4ai1rclnlVYe5h23UQMX6DweaRdEew&ext_session_id=3qb0qnoIqXz4mCFbiYsCMgmcRLytBhZVCDB51zpUPdg1PIAVx561pb0Yavusucb6Aa88T3YUhEipljhwpnnVggs6kNx5qOv0s1XcG6%2FPCxarmE%2Bs9qbl
-  DiscoveryError:
-    type: object
-    properties:
-      error:
-        type: string
-        description: Invalid_Request for Missing Redirect_URL scenario | "Unauthorized_Access" for Missing Authorization Header scenario
-        example: Invalid_Request
-      description:
-        type: string
-        description: Redirect_URL missing for Missing Redirect_URL scenario | "Your request needs a valid session or valid credentials" for Missing Authorization Header scenario
-        example: Redirect_URL missing
- 
-  MNC_MCC_Discovery_Resp:
+  IP_Discovery_Resp:
     type: object
     properties:
       ttl:
@@ -175,4 +147,35 @@ definitions:
                     items:
                       $ref: "#/definitions/OperatorLink"
 
+  IP_Discovery_OpSelection_Resp:
+    type: object
+    properties:
+      links:
+        type: array
+        description: Array of Operator API Links
+        items:
+          $ref: "#/definitions/OperatorLink"
 
+  OperatorLink:
+    type: object
+    properties:
+      rel:
+        type: string
+        description: Method Name like authorization,token,userinfo,tokenrevoke,operatorSelection,premiuminfo etc
+        example: operatorSelection
+      href:
+        type: string
+        description: Method API url for operator selection UI flow with session id
+        example: https://exchange-i-test.dn.apigee.net/apigee_monitor/v2/discovery/operator-selection?session_id=U7GXhTcpDAiLNJPpst6B4ai1rclnlVYe5h23UQMX6DweaRdEew&ext_session_id=3qb0qnoIqXz4mCFbiYsCMgmcRLytBhZVCDB51zpUPdg1PIAVx561pb0Yavusucb6Aa88T3YUhEipljhwpnnVggs6kNx5qOv0s1XcG6%2FPCxarmE%2Bs9qbl
+
+  DiscoveryError:
+    type: object
+    properties:
+      error:
+        type: string
+        description: "'Invalid_Request' for Missing Redirect_URL scenario | 'Unauthorized_Access' for Missing Authorization Header scenario"
+        example: Invalid_Request
+      description:
+        type: string
+        description: "'Redirect_URL missing' for Missing Redirect_URL scenario | 'Your request needs a valid session or valid credentials' for Missing Authorization Header scenario"
+        example: Redirect_URL missing
