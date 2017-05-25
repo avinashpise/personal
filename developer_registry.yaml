@@ -232,7 +232,7 @@ paths:
 
         * The specific Application requested should be available in the system
         for the specific Developer
-        
+
 
         **Error Scenario**
 
@@ -297,8 +297,8 @@ paths:
         * Valid products must be enabled for the Developer Operator organization. This is carried out at the time of provisioning the Developer Operator onto the Exchange. This information should also be available in the Operator Portal.
 
         * The Client name should be valid.
-        
-        
+
+
 
         **Error Scenario**
 
@@ -1005,8 +1005,8 @@ paths:
       summary: Get DeveloperClientName for specific developer
       description: >
         **Error Scenario**
-        
-        
+
+
         Below will be the error for invalid request.
 
           | Parameter | Scenario | Status        | Error Description |
@@ -1245,8 +1245,8 @@ paths:
       summary: Get All DeveloperClientNames for developer
       description: >
         **Error Scenario**
-        
-  
+
+
           | Parameter | Scenario | Status        | Error Description                            |
           |-----------|----------|---------------|-----------------------------------------------|
           | orgId     | Missing  | 404 Not Found | Requested Resource Not Found                  |
@@ -1381,7 +1381,7 @@ paths:
             properties:
               tncs:
                 type: string
-                
+
                 enum:
                 - all
       security:
@@ -1746,7 +1746,7 @@ definitions:
       tncUrl:
         type: string
         description: The TnC url from where to get the details of the TnC
-        example: http://tnc.subop.com/tnc.pdf 
+        example: http://tnc.subop.com/tnc.pdf
       tncText:
         type: string
         description: A brief text describing the TnC
@@ -2102,7 +2102,7 @@ definitions:
         description: >-
           This element refers to the Developer Operator Organization that the
           Application belongs to.
-          example: sb1
+        example: sb1
       devName:
         type: string
         description: Developer Name if the developer belongs to the requested organisation
@@ -2132,12 +2132,12 @@ definitions:
           type: string
           description: |
             Error for missing client_id/client_secret/status/type/redirectUri/name/status/product.name : "Invalid_Request"
-            example: Invalid_Request
+          example: Invalid_Request
         description:
           type: string
           description: |
             Description for missing client_id : "apikey/appSecret cannot be empty" | Description for missing client_secret : "apikey/appSecret cannot be empty" |  Description for missing status : "Invalid Status[undefined]" | Description for missing type : "Invalid type[undefined]" | Description for missing redirectUri : "Invalid redirectUri[undefined]" | Description for missing name : "Invalid Application Name" | Description for missing status : "Invalid Status[undefined]" | Description for missingproduct.name : "Invalid Product"
-            example: Invalid Application Name
+          example: Invalid Application Name
 
   ERROR_401:
     type: object
@@ -2160,12 +2160,12 @@ definitions:
         type: string
         description: |
           Error for missing/Invalid orgID : "Not Found" | Error for missing/Invalid devID :  "Not Found" | Error for missing/invalid appID : "Not Found"
-          example: Not Found
+        example: Not Found
       description:
         type: string
         description: |
           Description for missing orgID : "Requested Resource Not Found" | Description for Invalid orgID : "The Organization is not found in exchange now" | Description for missing devID : "Requested Resource Not Found" | Description for Invalid devID : "Developer Not Found" | Description for Missing/Invalid appID : "Application Not Found"
-          example: Requested Resource Not Found
+        example: Requested Resource Not Found
 
   ERROR_404_TNC:
     type: object
@@ -2174,12 +2174,12 @@ definitions:
         type: string
         description: |
           "Not_Found_Entity" for invalid devEmail, invalid tncID
-          example: Not_Found_Entity
+        example: Not_Found_Entity
       description:
         type: string
         description: |
           "Developer Not Found" for invalid devEmail | "No Compliance/TnC details for the given TncID" for invalid tncID scenario
-          example: Not Found
+        example: Not Found
 
   ERROR_500:
     type: object
