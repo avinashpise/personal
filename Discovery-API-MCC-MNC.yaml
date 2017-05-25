@@ -99,11 +99,11 @@ paths:
         400:
           description: Bad Request (Missing any of Redirect_URL, Identified-MNC, Identified-MCC)
           schema:
-            $ref: "#/definitions/DiscoveryError"
+            $ref: "#/definitions/DiscoveryError400"
         401:
           description: Unauthorized
           schema:
-            $ref: "#/definitions/DiscoveryError"
+            $ref: "#/definitions/DiscoveryError401"
 
     post:
       operationId: MCC-MNC-DISCOVERY-POST
@@ -188,11 +188,11 @@ paths:
         400:
           description: Bad Request (Missing any of Redirect_URL, Identified-MNC, Identified-MCC)
           schema:
-            $ref: "#/definitions/DiscoveryError"
+            $ref: "#/definitions/DiscoveryError400"
         401:
           description: Unauthorized
           schema:
-            $ref: "#/definitions/DiscoveryError"
+            $ref: "#/definitions/DiscoveryError401"
 
 # Security Definitions
 securityDefinitions:
@@ -247,7 +247,7 @@ definitions:
                     type: array
                     description: Array of Operator API Links
                     items:
-                      $ref: "#/definitions/OperatorLink"
+                      $ref: "#/definitions/OperatorLinks"
 
   MNC_MCC_Discovery_OpSelection_Resp:
     type: object
@@ -258,7 +258,7 @@ definitions:
         items:
           $ref: "#/definitions/OperatorLink"
 
-  OperatorLink:
+  OperatorLinks:
     type: object
     properties:
       href:
@@ -267,10 +267,22 @@ definitions:
         example: https://idp.mobileconnect.gemalto.com/idp/vodafonespain/oidc/mc/authorize
       rel:
         type: string
-        description: Method Name like authorization,token,userinfo,tokenrevoke,operatorSelection,premiuminfo etc
+        description: Method Name like authorization,token,userinfo,tokenrevoke,premiuminfo etc
         example: authorization
 
-  DiscoveryError:
+  OperatorLink:
+    type: object
+    properties:
+      href:
+        type: string
+        description: Method API url for operator selection UI flow with session id
+        example: https://exchange-i-test.dn.apigee.net/apigee_monitor/v2/discovery/operator-selection?session_id=U7GXhTcpDAiLNJPpst6B4ai1rclnlVYe5h23UQMX6DweaRdEew&ext_session_id=3qb0qnoIqXz4mCFbiYsCMgmcRLytBhZVCDB51zpUPdg1PIAVx561pb0Yavusucb6Aa88T3YUhEipljhwpnnVggs6kNx5qOv0s1XcG6%2FPCxarmE%2Bs9qbl
+      rel:
+        type: string
+        description: Method Name like operatorSelection
+        example: operatorSelection
+
+  DiscoveryError400:
     type: object
     properties:
       error:
@@ -280,4 +292,16 @@ definitions:
       description:
         type: string
         example: Redirect_URL missing
+        description: "'Redirect_URL missing' for Missing Redirect_URL, 'The Mnc value is not specified in this discovery request' for Missing Identified-MNC, 'The Mcc value is not specified in this discovery request' for Missing Identified-MCC scenarios | 'Redirect_URL missing' for Missing Redirect_URL scenario | 'Your request needs a valid session or valid credentials' for Missing Authorization Header scenario | 'There is no organization with the specified mcc/mnc pair' for Wrong MCC/MNC Pair scenario"
+
+  DiscoveryError401:
+    type: object
+    properties:
+      error:
+        type: string
+        description: "'Invalid_Request' for Missing Redirect_URL, Missing Identified-MNC, Missing Identified-MCC scenarios | 'Unauthorized_Access' for Missing Authorization Header scenario | 'Not_Found_Entity' for Wrong MCC/MNC Pair scenario"
+        example: Unauthorized_Access
+      description:
+        type: string
+        example: Your request needs a valid session or valid credentials
         description: "'Redirect_URL missing' for Missing Redirect_URL, 'The Mnc value is not specified in this discovery request' for Missing Identified-MNC, 'The Mcc value is not specified in this discovery request' for Missing Identified-MCC scenarios | 'Redirect_URL missing' for Missing Redirect_URL scenario | 'Your request needs a valid session or valid credentials' for Missing Authorization Header scenario | 'There is no organization with the specified mcc/mnc pair' for Wrong MCC/MNC Pair scenario"
