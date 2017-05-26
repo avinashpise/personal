@@ -44,7 +44,7 @@ paths:
       parameters:
         - name: org_name
           in: path
-          description: Serving Operator (MNO) Organization Name
+          description: Service Provider Organization Name
           required: true
           type: string
         - name: Accept
