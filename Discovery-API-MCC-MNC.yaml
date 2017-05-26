@@ -46,7 +46,7 @@ paths:
       parameters:
         - name: org_name
           in: path
-          description: Serving Operator (MNO) Organization  name as created in the Exchange
+          description: Service Provider Organization  name as created in the Exchange
           required: true
           type: string
         - name: Accept
