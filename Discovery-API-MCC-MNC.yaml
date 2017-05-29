@@ -83,7 +83,7 @@ paths:
           type: boolean
         - name: Manually-Select
           in: query
-          description: Set Cookies true/false
+          description: Set(true/false) manually selection 
           type: boolean
       security:
       - BasicAuth: []
