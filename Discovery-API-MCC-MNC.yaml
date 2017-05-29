@@ -83,7 +83,7 @@ paths:
           type: boolean
         - name: Manually-Select
           in: query
-          description: Set(true/false) manually selection 
+          description: Set(true/false) manually selection
           type: boolean
       security:
       - BasicAuth: []
@@ -263,7 +263,7 @@ definitions:
     properties:
       href:
         type: string
-        description: Method API url for operator selection UI flow with session id
+        description: API url for method from serving operator
         example: https://idp.mobileconnect.gemalto.com/idp/vodafonespain/oidc/mc/authorize
       rel:
         type: string
