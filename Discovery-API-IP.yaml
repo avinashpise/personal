@@ -165,7 +165,7 @@ definitions:
         example: authorization
       href:
         type: string
-        description: Method API url for operator selection UI flow with session id
+        description: API url for method from serving operator
         example: https://exchange-i-test.dn.apigee.net/oauth/telenor_pakistan/authorize
 
   OperatorLink:
