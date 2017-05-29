@@ -17,11 +17,12 @@ paths:
       operationId: SESSION-DISCOVERY-GET
       summary: Validating Session ID
       description: |
-        **Valid Responses**
+        **Responses**
 
-        | Scenario        | Parameters | Status       | Description                 |
-        |-----------------|------------|--------------|-----------------------------|
-        | With session_id | session_id | 302 Redirect | Redirects to UI, with msisdn selection option if the session is valid. Else displays session invalid message |
+          | Scenario                        | Parameters                  | Status       | Description                                                                                                  |
+          |---------------------------------|-----------------------------|--------------|--------------------------------------------------------------------------------------------------------------|
+          | With session_id                 | session_id                  | 200 Redirect | Opens HTML view, with msisdn selection option if the session is valid |
+          | With expired/invalid session_id | expired/invalid session_id  | 200  | Display session invalid message                                                                              |
       parameters:
         - name: org_name
           in: path
@@ -42,19 +43,22 @@ paths:
           required: true
           type: string
       responses:
-        302:
-          description: Redirect to discovery UI.
+        200:
+          description: Opens HTML containt view to accept MSISDN with MCC.
 
   /{org_name}/v2/discovery/msisdn-submit:
     post:
       operationId: MSISDN-SUBMIT
       summary: Redirect to URL from UI
       description: |
-        **Valid Responses**
+        **Responses**
 
-        | Scenario        | Parameters | Status       | Description                 |
-        |-----------------|------------|--------------|-----------------------------|
-        | With session_id | session_id, discovery_token, nonce, MSISDN, accept-terms | 302 Redirect | Redirects to UI provided while starting the session, if the session is valid. Else displays session invalid message |
+        | Scenario                        | Parameters                                                    | Status       | Description                                                                               |
+        |---------------------------------|---------------------------------------------------------------|--------------|-------------------------------------------------------------------------------------------|
+        | With session_id                 | session_id, discovery_token, nonce, MSISDN, accept-terms      | 200  | Redirects to UI provided while starting the session                                       |
+        | With expired/invalid session_id | expired/invalid, discovery_token, nonce, MSISDN, accept-terms | 200          | Display session invalid message                                                           |
+        | Invalid MSISDN                  | session_id, discovery_token, nonce, MSISDN, accept-terms      | 200          | Display manual selection view with message like "you need to choose your mobile network." |
+        |                                 |                                                               |              |                                                                                           |
       parameters:
         - name: org_name
           in: path
@@ -101,8 +105,8 @@ paths:
                 enum:
                   - on
       responses:
-        302:
-          description: Redirect to discovery UI with MCC/MNC and encrypted MSISDN
+        200:
+          description: Redirect to redirect_url  with MCC/MNC and encrypted MSISDN
 
   /{org_name}/v2/discovery/operator-submit:
     post:
@@ -111,9 +115,10 @@ paths:
       description: |
         **Valid Responses**
 
-        | Scenario        | Parameters | Status      | Description                 |
-        |-----------------|------------|-------------|-----------------------------|
-        | With session_id | session_id, discovery_token, nonce, region, country, operator, accept-terms | 302 Redirect | Redirects to UI provided while starting the session, if the session is valid. Else displays session invalid message |
+        | Scenario                        | Parameters                                                                  | Status       | Description                                                                             |
+        |---------------------------------|-----------------------------------------------------------------------------|--------------|-----------------------------------------------------------------------------------------|
+        | With session_id                 | session_id, discovery_token, nonce, region, country, operator, accept-terms | 200 Redirect | Redirects to redirect_url provided while starting the session, if the session is valid. |
+        | With expired/invalid session_id | session_id, discovery_token, nonce, region, country, operator, accept-terms | 200  | Display session invalid message                                                         |
       parameters:
         - name: org_name
           in: path
@@ -166,5 +171,5 @@ paths:
                 enum:
                   - on
       responses:
-        302:
-          description: Redirect to discovery UI with MCC/MNC
+        200:
+          description: Redirect to redirect_url with MCC/MNC
